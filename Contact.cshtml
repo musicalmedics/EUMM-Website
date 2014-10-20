@@ -1,0 +1,62 @@
+﻿@{
+    Layout     = "~/_SiteLayout.cshtml";
+    Page.Title = "Contact";
+
+    string stephPic = UserHelper.IsSmashing() ? 
+        "Images/SmashingStephanie.png" : "Images/Stephanie.png";
+}
+
+<hgroup class="title">
+    <h1>@Page.Title.</h1>
+    <h2>Our contact details.</h2>
+</hgroup>
+
+<article>
+    <br />
+    <h2>The Librarian Team</h2>
+
+
+    <div class="contact">
+        <img src="@stephPic" style="float: left" width="94" />
+
+        <p class="name">Stephanie Wolff</p>
+        <p class="title">Choral Librarian</p>
+        <p class="email">stephanie.wolff@ymail.com</p>
+    </div>
+    <div class="contact">
+        <img src="Images/James.jpg" style="float: left" width="94" />
+
+        <p class="name">James Renwick</p>
+        <p class="title">Orchestral Librarian</p>
+        <p class="email">jsrenwick3@gmail.com</p>
+    </div>
+
+    <br/>
+    <h2 style="margin-top: 50px">The Society</h2>
+    <div style="margin-top: 20px">
+        
+        <p><a href="http://www.eusa.ed.ac.uk/societies/society/EUMM2011/">
+            Society Webpage</a></p>
+        <p><a href="https://www.facebook.com/groups/307200819293452/">
+            Society Facebook Group</a></p>
+        <p><a href="https://twitter.com/EUMusicalMedics">
+            Society Twitter</a></p>
+        <br/>
+
+        <p>Email us at <a href="mailto:edinburghmusicalmedics@gmail.com">
+            edinburghmusicalmedics@gmail.com</a></p>
+
+    </div>
+</article>
+
+<!--aside>
+    <h3>Aside Title</h3>
+    <p>
+        Use this area to provide additional information.
+    </p>
+    <ul>
+        <li><a href="~/">Home</a></li>
+        <li><a href="~/About">About</a></li>
+        <li><a href="~/Contact">Contact</a></li>
+    </ul>
+</aside-->

@@ -1,0 +1,141 @@
+﻿@{
+    Layout     = "~/_SiteLayout.cshtml";
+    Page.Title = "Your Details";
+
+    string studentid = Request.QueryString["sid"];
+
+    dynamic user = null;
+
+    // Setup validation
+    Validation.RequireField("firstName", "Please give your first name.");
+    Validation.RequireField("lastName", "Please give your last name.");
+    Validation.RequireField("email", "You must specify an email address.");
+    Validation.RequireField("password", "Password cannot be blank.");
+    Validation.Add("confirmPassword",
+        Validator.EqualsTo("password", "Password and confirmation password do not match."));
+    Validation.Add("password",
+        Validator.StringLength(
+            maxLength: Int32.MaxValue,
+            minLength: 6,
+            errorMessage: "Password must be at least 6 characters"));
+    Validation.Add("email",
+        Validator.Regex("^.+@.+$"),
+        Validator.StringLength(
+            maxLength: 120,
+            minLength: 3,
+            errorMessage: "Email must be a valid address between 3 and 120 characters long."));
+    
+    
+    // Validate the student id
+    // Note that existing users can update their accounts
+    if (String.IsNullOrWhiteSpace(studentid) || 
+        (user = UserHelper.GetUser(studentid)) == null)
+    {
+        Response.Redirect("~/Account/ExternalLoginFailure");
+        return;
+    }
+    // Log out existing user for this
+    else if (WebSecurity.IsAuthenticated) {
+        WebSecurity.Logout();
+    }
+
+    int? HRESULT = null;
+    
+    // We're actually performing the confirmation
+    if (IsPost)
+    {
+        AntiForgery.Validate();
+        
+        // If an existing user, check password matches
+        if (WebSecurity.UserExists(studentid))
+        {
+            // Check if account has been locked out
+            if (WebSecurity.GetPasswordFailuresSinceLastSuccess(studentid) > 4
+            && WebSecurity.GetLastPasswordFailureDate(studentid).AddSeconds(60) > DateTime.UtcNow)
+            {
+                Response.Redirect("~/Account/AccountLockedOut");
+                return;
+            }
+            // Otherwise check that the provided password is the same as the current one
+            if (!WebSecurity.Login(studentid, Request.Form["password"]))
+            {
+                Validation.AddFormError("Your account already exists and the passwords do not match.");
+            }
+        }
+        
+        if (Validation.IsValid())
+        {
+            // Update their details
+            HRESULT = UserHelper.ConfirmUser(studentid, Request.Form);
+        
+            // Create the login account - now they can log in properly
+            WebSecurity.CreateUserAndAccount(studentid, Request.Form["password"]);
+            
+            // Now log in
+            WebSecurity.Login(studentid, Request.Form["password"]);
+
+            Response.Redirect("~/MyMusic");
+            return;
+        }
+    }
+    
+    // If they have no existing email, use the student one
+    string userEmail = Request.Form["email"] ?? user.Email ?? studentid + "@sms.ed.ac.uk";
+    string firstName = Request.Form["firstName"] ?? user.FirstName;
+    string lastName  = Request.Form["firstName"] ?? user.FirstName;
+}
+
+<hgroup class="title">
+    <h1>@Page.Title.</h1>
+    <h2>Please confirm the details we have for you.</h2>
+</hgroup>
+
+<form method="post">
+    @AntiForgery.GetHtml()
+
+    @Html.ValidationSummary(Locale.Messages["ErrorValid"], excludeFieldErrors: true, htmlAttributes: null)
+
+    <fieldset>
+        <legend>Details</legend>
+        <ol>
+            <li>
+                <label for="firstName" @if (!ModelState.IsValidField("firstName")) { <text> class="error-label" </text> }>First Name</label>
+                <input type="text" id="firstName" name="firstName" value="@firstName" @Validation.For("firstName") />
+                @Html.ValidationMessage("firstName")
+            </li>
+            <li>
+                <label for="lastName" @if (!ModelState.IsValidField("lastName")) { <text> class="error-label" </text> }>Last Name</label>
+                <input type="text" id="lastName" name="lastName" value="@user.LastName" @Validation.For("lastName") />
+                @Html.ValidationMessage("lastName")
+            </li>
+            <li>
+                <p>We will only use this e-mail address to send important reminders - such as if you have music overdue.<br/>
+                This can help prevent late fees where applicable.</p>
+            </li>
+            <li>
+                <label for="email" @if (!ModelState.IsValidField("email")) { <text> class="error-label" </text>  }>E-mail</label>
+                <input type="text" id="email" name="email" value="@userEmail" @Validation.For("email") />
+                @Html.ValidationMessage("email")
+            </li>
+            <li>
+                <p> Please enter a new password to secure your account with us. 
+                If you are updating your details having already completed this previously,
+                please enter your existing password.</p>
+            </li>
+            <li class="password">
+                <label for="password" @if(!ModelState.IsValidField("password")) { <text> class="error-label" </text> }>Create Password</label>
+                <input type="password" id="password" name="password" @Validation.For("password") />
+                @* Write any password validation errors to the page *@
+                @Html.ValidationMessage("password")
+            </li>
+            <li class="confirm-password">
+                <label for="confirmPassword" @if(!ModelState.IsValidField("confirmPassword")) { <text> class="error-label" </text> }>Confirm password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" @Validation.For("confirmPassword") />
+                @* Write any password validation errors to the page *@
+                @Html.ValidationMessage("confirmPassword")
+            </li>
+        </ol>
+        <p>By clicking submit, you agree to be legally bound by the terms set out <a href="~/Legal">here.</a></p>
+        <input type="submit" value="Confirm" />
+    </fieldset>
+</form>

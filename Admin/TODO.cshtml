@@ -1,0 +1,73 @@
+﻿@using WebMatrix.WebData
+@{
+    WebSecurity.RequireAuthenticatedUser();
+
+    // Ensure member is admin
+    if (!UserHelper.IsAdmin(WebSecurity.CurrentUserName)) {
+        Response.Redirect("~/Account/ExternalLoginFailure");
+    }
+    Layout     = "~/_SiteLayout.cshtml";
+    Page.Title = "TODO";
+
+    var db   = Database.Open(Website.DBName);
+    var user = UserHelper.GetUser();
+
+    if (IsPost)
+    {
+        foreach (string key in Request.Form.Keys)
+        {
+            int id;
+            if (int.TryParse(key, out id)) {
+                db.Execute("UPDATE Loans SET Fulfilled='1' WHERE ID='"+key+"'");
+            }
+        }
+    }
+    var view = UserHelper.GetRequests();
+
+}
+
+<script type="text/javascript">
+    function markAsDone()
+    {
+        if (confirm("Are you sure you wish to mark the selected records as fulfilled?")) {
+            document.getElementById("form").submit();
+        }
+    }
+</script>
+
+<hgroup class="title">
+    <h1>TODO.</h1>
+    <h2>Requests yet to be fulfilled.</h2>
+</hgroup>
+<br/>
+<form method="post" id="form">
+<table>
+    <tr>
+        <td></td>
+        <td><b>Member Name</b></td>
+        <td><b>Piece Title</b></td>
+        <td><b>Part Name</b></td>
+        <td><b>Format</b></td>
+        <td><b>Deposit</b></td>
+        <td><b>Requested On</b></td>
+        <td><b>Member Email</b></td>
+    </tr>
+
+    @foreach (var row in view)
+    {
+        var name = row.FirstName + ' ' + row.LastName;
+        <tr>
+            <td><input type="checkbox" title="Select Row" name=@row.ID /></td>
+            <td>@name</td>
+            <td>@row.Title</td>
+            <td>@row.Designation</td>
+            <td>@Website.GetLoanFormatName(row.Format)</td>
+            <td>@Website.GetPounds(row.Deposit)</td>
+            <td>@row.LoanStart.ToShortDateString()</td>
+            <td>@row.Email</td>
+        </tr>
+    }
+</table>
+<br/>
+<input type="button" value="Mark as Fulfilled" onclick="markAsDone()" />
+</form>
