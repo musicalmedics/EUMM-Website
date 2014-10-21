@@ -66,6 +66,22 @@ public static class LoanHelper
         return part.Count == null || (part.Count - loans.Count) > 0;
     }
 
+    public static string GetDownloadPath(string partID)
+    {
+        Database db = Database.Open(Website.DBName);
+
+        var tokens = db.Query(String.Format("SELECT * FROM DlTokens WHERE Part='{0}' AND Member='{1}'",
+            partID, WebSecurity.CurrentUserName));
+
+        if (!tokens.Any()) {
+            throw new Exception("No valid download token for this part");
+        }
+        var token = tokens.First();
+        db.Execute("DELETE FROM DlTokens WHERE Token='"+token.Token+"'");
+
+        return db.QueryValue("SELECT DigitalCopyPath FROM Parts WHERE ID='"+partID+"'");
+    }
+
     public static int CreateLoan(string partID, string format, DateTime returnDate)
     {
         return CreateLoan(WebSecurity.CurrentUserName, partID, format, returnDate);
@@ -75,8 +91,16 @@ public static class LoanHelper
         DateTime ret = returnDate;
         Database db  = Database.Open(Website.DBName);
 
-        // Digital copies are automatically fulfilled
-        char fulfilled = (format == Website.Format_DigitalCopy.ToString()) ? '1' : '0';
+        char fulfilled = '0';
+
+        if (format == Website.Format_DigitalCopy.ToString())
+        {
+            fulfilled = '1'; // Digital copies are automatically fulfilled
+
+            // Add digital download token for that type and user
+            int i = db.Execute(String.Format("INSERT INTO DlTokens (Member, Part) VALUES ('{0}','{1}')",
+                member, partID));
+        }
 
         return db.Execute(String.Format
         (

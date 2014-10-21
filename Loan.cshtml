@@ -49,19 +49,11 @@
                 LoanHelper.CreateLoan(part, format, Website.CalculateReturnDate(pieceRecord));
 
                 // Perform download of resource if available
-                if (format == Website.Format_DigitalCopy.ToString()) 
-                {
-                    string pfdType = System.Net.Mime.MediaTypeNames.Application.Pdf;
-                    try
-                    {
-                        Website.RedirectToDownload(Server.MapPath("~/Hidden/" +
-                            partRecord.DigitalCopyPath), pfdType, Response);
-                    }
-                    catch (System.Threading.ThreadAbortException) { throw; } // Response.Redirect throws TAE, so don't catch
-                    catch { Response.Redirect("~/ThankYou?err=File"); return; }
+                if (format == Website.Format_DigitalCopy.ToString()) {
+                    Response.Redirect("~/ThankYou?err=Download&dl=" + part); return;
                 }
                 // Otherwise, just display thank you page
-                Response.Redirect("~/ThankYou?err=Success"); return;
+                else { Response.Redirect("~/ThankYou?err=Success"); return; }
             }
             else { Response.Redirect("~/ThankYou?err=ReqInvalid"); return; }
         }
