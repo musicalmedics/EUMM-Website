@@ -55,10 +55,11 @@
 
     @foreach (var row in view)
     {
-        var name = row.FirstName + ' ' + row.LastName;
+        var title = row.FirstName + ' ' + row.LastName;
+        var name  = UserHelper.IsSmashing()?"Nigel Thornberry":title;
         <tr>
             <td><input type="checkbox" title="Select Row" name=@row.ID /></td>
-            <td>@name</td>
+            <td title="@title">@name</td>
             <td>@row.Title</td>
             <td>@row.Designation</td>
             <td>@Website.GetLoanFormatName(row.Format)</td>

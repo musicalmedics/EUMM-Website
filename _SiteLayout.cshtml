@@ -2,10 +2,16 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <title>EUMM Music Library</title>
         <link href="~/Content/themes/base/jquery.ui.all.css" rel="stylesheet" type="text/css" />
         <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
-        <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+        @if (UserHelper.IsSmashing()) {
+            <title>Nigel</title>
+            <link href="~/favicon2.ico" rel="shortcut icon" type="image/x-icon" />
+        }
+        else {
+            <title>EUMM Music Library</title>
+            <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+        }
         <script src="~/Scripts/jquery-1.8.2.min.js"></script>
         <script src="~/Scripts/jquery-ui-1.8.24.js"></script>
         <script src="~/Scripts/modernizr-2.6.2.js"></script>
@@ -35,19 +41,30 @@
                     </section>
                     <nav>
                         <ul id="menu">
-                            <li><a href="~/">Home</a></li>
+                            <li>@if(UserHelper.IsSmashing()) { <a href="~/"><b>N</b>ome</a> } else { <a href="~/">Home</a> }</li>
                             @if (WebSecurity.IsAuthenticated && UserHelper.IsAdmin())
                             {
                                 string count = UserHelper.CountRequests().ToString();
-                                <li><a href="~/Admin/TODO">Admin (@count)</a></li>
+
+                                if(UserHelper.IsSmashing()) {
+                                <li><a href="~/Admin/TODO"><b>I</b>dmin (@count)</a></li>
+                                }
+                                else { <li><a href="~/Admin/TODO">Admin (@count)</a></li> }
                             }
+                            @if(UserHelper.IsSmashing()) {
+                            <li><a href="~/MyMusic"><b>G</b>y Music</a></li>
+                            <li><a href="~/List"><b>E</b>oncert</a></li>
+                            <li><a href="~/Contact"><b>L</b>ontact Us</a></li>
+                            }
+                            else {
                             <li><a href="~/MyMusic">My Music</a></li>
                             <li><a href="~/List">Concert</a></li>
                             <li><a href="~/Contact">Contact Us</a></li>
+                            }
 
                             @if (UserHelper.IsSmashing()) {
                             <li><a href="http://www.youtube.com/watch?v=j4eBvejTvMg">
-                                <img src="Images/smashing.png" style="margin:0px -15px -26px 0px" /></a>
+                                <img src="~/Images/smashing.png" style="margin:0px -15px -26px 0px" /></a>
                             </li>
                             }
                         </ul>
