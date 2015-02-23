@@ -562,6 +562,8 @@ table {
     border-spacing: 0;
     margin-top: 0.75em;
     border: 0 none;
+    display: block;
+    overflow-x: auto;
 }
 
 th {
