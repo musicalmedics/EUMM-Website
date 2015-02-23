@@ -1,0 +1,30 @@
+﻿@{
+    // Redirect to error if not authenticated
+    if (!WebSecurity.IsAuthenticated || !UserHelper.IsAdmin()) { 
+        Response.RedirectPermanent("~/ThankYou"); return; 
+    }
+
+    var action = Request.QueryString["action"];
+    var redir  = Request.QueryString["redir"];
+
+    if (action == "cancel")
+    {
+        var reqID = Request.QueryString["req"];
+        if (reqID != null) { LoanHelper.CancelRequest(reqID.AsInt()); }
+    }
+
+    if (redir == "TODO") { Response.RedirectPermanent("~/Admin/TODO"); }
+    
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title></title>
+    </head>
+    <body>
+        
+    </body>
+</html>

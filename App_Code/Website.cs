@@ -1,6 +1,6 @@
 ﻿/* Website.cs - (c) James S Renwick 2014
  * -------------------------------------
- * Version 1.1.0
+ * Version 1.1.1
  */
 using System;
 using System.Collections.Generic;
@@ -31,6 +31,23 @@ public static partial class Website
     public static string GetPounds(double f)
     {
         return f.ToString("C2", CultureInfo.CreateSpecificCulture("en-GB"));
+    }
+
+    /// <summary>
+    /// Sanitises the input string by replacing symbols and control chars 
+    /// with underscores. If input is null, returns null.
+    /// </summary>
+    public static string Sanitise(string value)
+    {
+        if (value == null) return null;
+
+        var sb = new System.Text.StringBuilder(value.Length);
+        foreach (char c in value)
+        {
+            if (char.IsControl(c) || char.IsSymbol(c)) sb.Append('_');
+            else                                       sb.Append(c);
+        }
+        return sb.ToString();
     }
 
     /// <summary>

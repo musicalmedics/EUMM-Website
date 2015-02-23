@@ -9,20 +9,28 @@
     Layout     = "~/_SiteLayout.cshtml";
     Page.Title = "TODO";
 
-    var db   = Database.Open(Website.DBName);
-    var user = UserHelper.GetUser();
+    var db = Database.Open(Website.DBName);
+
+    var action = Request.Form["action"];
 
     if (IsPost)
     {
         foreach (string key in Request.Form.Keys)
         {
             int id;
-            if (int.TryParse(key, out id)) {
-                db.Execute("UPDATE Loans SET Fulfilled='1' WHERE ID='"+key+"'");
+            if (int.TryParse(key, out id))
+            {
+                if (action == "fulfil") {
+                    db.Execute("UPDATE Loans SET Fulfilled='1' WHERE ID='"+key+"'");
+                }
+                else if (action == "return") {
+                    db.Execute("UPDATE Loans SET Returned='1', ReturnedOn=GETDATE() WHERE ID='"+key+"'");
+                }
             }
         }
     }
-    var view = UserHelper.GetRequests();
+    var view  = UserHelper.GetRequests();
+    var loans = LoanHelper.GetAllCurrentLoans();
 
 }
 
@@ -31,6 +39,12 @@
     {
         if (confirm("Are you sure you wish to mark the selected records as fulfilled?")) {
             document.getElementById("form").submit();
+        }
+    }
+    function markAsReturned()
+    {
+        if (confirm("Are you sure you wish to mark the selected loans as returned?")) {
+            document.getElementById("form2").submit();
         }
     }
 </script>
@@ -64,11 +78,57 @@
             <td>@row.Designation</td>
             <td>@Website.GetLoanFormatName(row.Format)</td>
             <td>@Website.GetPounds(row.Deposit)</td>
-            <td>@row.LoanStart.ToShortDateString()</td>
+            <td>@row.LoanStart.ToString("dd/MM/yyyy")</td>
             <td>@row.Email</td>
+            <td><a href="~/Admin/do?action=cancel&req=@row.ID&redir=TODO" title="Click to cancel this request">Cancel</a></td>
         </tr>
     }
 </table>
 <br/>
 <input type="button" value="Mark as Fulfilled" onclick="markAsDone()" />
+<input type="hidden" name="action" value="fulfil" />
 </form>
+
+<br/>
+
+<section>
+<h2 style="margin-bottom:-15px">Current Loans</h2>
+
+<br/>
+
+<form method="post" id="form2">
+<table>
+    <tr>
+        <td></td>
+        <td><b>Member Name</b></td>
+        <td><b>Piece Title</b></td>
+        <td><b>Part Name</b></td>
+        <td><b>Format</b></td>
+        <td><b>Deposit</b></td>
+        <td><b>Requested On</b></td>
+        <td><b>Return By</b></td>
+        <td><b>Member Email</b></td>
+    </tr>
+
+    @foreach (var row in loans)
+    {
+        var title = row.FirstName + ' ' + row.LastName;
+        var name  = UserHelper.IsSmashing()?"Nigel Thornberry":title;
+        <tr>
+            <td><input type="checkbox" title="Select Row" name=@row.ID /></td>
+            <td title="@title">@name</td>
+            <td>@row.Title</td>
+            <td>@row.Designation</td>
+            <td>@Website.GetLoanFormatName(row.Format)</td>
+            <td>@Website.GetPounds(row.Deposit)</td>
+            <td>@row.LoanStart.ToString("dd/MM/yyyy")</td>
+            <td>@row.LoanEnd.ToString("dd/MM/yyyy")</td>
+            <td>@row.Email</td>
+        </tr>
+    }
+</table>
+<br/>
+<input type="button" value="Mark as Returned" onclick="markAsReturned()" />
+<input type="hidden" name="action" value="return" />
+</form>
+</section>

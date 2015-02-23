@@ -41,7 +41,7 @@
                 <td>@row.Part.Piece.Title</td>
                 <td>@row.Part.Instrument</td>
                 <td>@Website.GetLoanFormatName(row.Format)</td>
-                <td>@row.LoanEnd.ToShortDateString()</td>
+                <td>@row.LoanEnd.ToString("dd/MM/yyyy")</td>
                 <td>@Website.GetStatusText(row)</td>
                 <td>@Website.GetPounds(row.Fees)</td>
                 <td>
@@ -75,7 +75,7 @@
                 string retDate = "<unknown>";
                 
                 if (row.ReturnedOn != null) {
-                    retDate = row.ReturnedOn.ToShortDateString();
+                    retDate = row.ReturnedOn.ToString("dd/MM/yyyy");
                 }
                 
             <tr>

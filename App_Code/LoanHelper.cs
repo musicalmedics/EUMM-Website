@@ -9,6 +9,11 @@ using WebMatrix.WebData;
 /// </summary>
 public static class LoanHelper
 {
+    public static IEnumerable<dynamic> GetInstrumentList()
+    {
+        return Database.Open(Website.DBName).Query("SELECT DISTINCT Instrument FROM Parts");
+    }
+
     public static IEnumerable<dynamic> GetLoanablePieces()
     {
         var db = Database.Open(Website.DBName);
@@ -23,8 +28,30 @@ public static class LoanHelper
 
     public static IEnumerable<dynamic> GetCurrentLoans(string partID)
     {
+        int.Parse(partID); // Validate input
+
         var db = Database.Open(Website.DBName);
         return db.Query("SELECT * FROM Loans WHERE Returned='0' AND Part='" + partID + "'");
+    }
+
+    public static IEnumerable<dynamic> GetAllCurrentLoans()
+    {
+        var user = UserHelper.GetUser();
+
+        if (!user.IsAdmin) throw new Exception("Administrative privileges requried for this operation");
+        if (!user.IsOrchestra && !user.IsChoir) return new List<Object>();
+
+        var db = Database.Open(Website.DBName);
+
+        if (user.IsOrchestra && user.IsChoir) {
+            return db.Query("SELECT * FROM [Loans - Simple] ORDER BY [LoanStart] DESC");
+        }
+        else if (user.IsOrchestra) {
+            return db.Query("SELECT * FROM [Loans - Simple] WHERE [Library]='0' ORDER BY [LoanStart] DESC");
+        }
+        else /*if (user.IsChoir) */ {
+            return db.Query("SELECT * FROM [Loans - Simple] WHERE [Library]='1' ORDER BY [LoanStart] DESC");
+        }
     }
 
     public static bool IsRenting(IEnumerable<dynamic> loans)
@@ -34,6 +61,8 @@ public static class LoanHelper
 
     public static IEnumerable<dynamic> GetParts(string pieceID, string orderBy="Instrument")
     {
+        int.Parse(pieceID); // Validate input
+
         var db = Database.Open(Website.DBName);
         var q  = db.Query("SELECT * FROM Parts WHERE Piece='" + pieceID + "' ORDER BY "+orderBy);
 
@@ -68,6 +97,8 @@ public static class LoanHelper
 
     public static string GetDownloadPath(string partID)
     {
+        int.Parse(partID); // Validate input
+
         Database db = Database.Open(Website.DBName);
 
         var tokens = db.Query(String.Format("SELECT * FROM DlTokens WHERE Part='{0}' AND Member='{1}'",
@@ -88,6 +119,9 @@ public static class LoanHelper
     }
     public static int CreateLoan(string member, string partID, string format, DateTime returnDate)
     {
+        // Validate input
+        int.Parse(partID); int.Parse(format); member = Website.Sanitise(member);
+
         DateTime ret = returnDate;
         Database db  = Database.Open(Website.DBName);
 

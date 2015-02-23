@@ -1,7 +1,7 @@
 ﻿@{
     Page.Title = "Loan";
     Layout     = "~/_SiteLayout.cshtml";
-    
+
     // Make sure we're logged in before continuing
     if (!WebSecurity.IsAuthenticated)
     {
@@ -12,7 +12,7 @@
     var pieces = LoanHelper.GetLoanablePieces();
 
     IEnumerable<dynamic> parts = null, loans = null;
-    
+
     dynamic pieceRecord = null;
     dynamic partRecord  = null;
 
@@ -23,7 +23,7 @@
         var format = Request.Form["format"];
 
         parts = LoanHelper.GetParts(piece);
-        
+
         // Get the actual record for the pieceID
         foreach (var p in pieces) {
             if (p.ID.ToString() == piece) { pieceRecord = p; }
@@ -39,7 +39,7 @@
                 loans = LoanHelper.GetCurrentLoans(part);
             }
         }
-        
+
         // User sumbmitted complete form - now attempt to create loan
         if (!String.IsNullOrWhiteSpace(format))
         {
@@ -60,18 +60,10 @@
     }
 }
 
-<input type="button" value="Start Over" style="float:right" onclick="window.location.href='Loan'" />
-<p>This page is a work in progress. Please give feedback <a href="mailto:@Website.Webmaster?subject='Library%20Lending%20Feedback'">
-    here.
-</a></p>
-<br />
-
-<form method="post">
-    <div style="background-color: white; border: 1px solid #d0d0d0; margin: 0 auto; max-width: 800px; padding: 20px">
-        <img src="~/Images/orderedList1.png" style="float:left" />
-        <h2 style="margin-left:40px; margin-top: 0px">Select the Piece</h2>
-        <br/>
-        <div style="margin-left:20%">
+<form class="multipanel" method="post">
+    <div class="panel" data-number="1">
+        <h2 class="title">Select the Piece</h2>
+        <div class="content-center">
             <select name="piece" @if (IsPost) { <text> disabled </text>  }>
                 @foreach (var piece in pieces)
                 {
@@ -83,14 +75,11 @@
             else { <input type="hidden" name="piece" value="@Request.Form["piece"]"/> }
         </div>
     </div>
-    <br/>
     @if (IsPost)
     { 
-    <div style="background-color: white; border: 1px solid #d0d0d0; margin: 0 auto; max-width: 800px; padding: 20px">
-        <img src="~/Images/orderedList2.png" style="float:left" />
-        <h2 style="margin-left:40px; margin-top: 0px">Select the Part</h2>
-        <br/>
-        <div style="margin-left:20%">
+    <div class="panel" data-number="2">
+        <h2 class="title">Select the Part</h2>
+        <div class="content-center">
             <select name="part" @if (loans != null) { <text>disabled </text> }>
                 @foreach (var part in parts)
                 {
@@ -104,11 +93,9 @@
     </div>
         if (loans != null)
         {
-            <br />
-            <div style="background-color: white; border: 1px solid #d0d0d0; margin: 0 auto; max-width: 800px; padding: 20px">
-                <img src="~/Images/orderedList3.png" style="float:left" />
-                <h2 style="margin-left:40px; margin-top: 0px">Request Loan</h2>
-                <div style="margin-left:10%">
+            <div class="panel" data-number="3">
+                <h2 class="title">Request Loan</h2>
+                <div class="content">
                     @if (partRecord.Count != null && LoanHelper.IsRenting(loans)) {
                     <p>
                         Our records show that you are currently renting a copy of this part.
@@ -152,11 +139,10 @@
 
                         <em>@pieceRecord.NotesUponLoan</em>
                         <br />
-                        <p>You may borrow this piece until @Website.CalculateReturnDate(pieceRecord).ToShortDateString()</p>
+                        <p>You may borrow this piece until @Website.CalculateReturnDate(pieceRecord).ToString("dd/MM/yyyy")</p>
                         
                         <input type="submit" value="Accept and Request" onclick="window.location.href='/ThankYou'" />
                     }
-
                     </div>
             </div>
         }
@@ -167,4 +153,7 @@
             </div>
         }
     }
+
+    <input type="button" class="reset-btn" value="Start Over" onclick="window.location.href='Loan'"/>
+
 </form>

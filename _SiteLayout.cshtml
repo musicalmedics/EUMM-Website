@@ -4,6 +4,7 @@
         <meta charset="utf-8" />
         <link href="~/Content/themes/base/jquery.ui.all.css" rel="stylesheet" type="text/css" />
         <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
+        <link href="~/Content/controls.css" rel="stylesheet" type="text/css" />
         @if (UserHelper.IsSmashing()) {
             <title>Nigel</title>
             <link href="~/favicon2.ico" rel="shortcut icon" type="image/x-icon" />
@@ -74,7 +75,8 @@
         </header>
         <div id="body">
             @RenderSection("featured", required: false)
-            <section class="content-wrapper main-content clear-fix">
+            @RenderSection("infobanner", required: false)
+            <section class="content-wrapper main-content clear-fix" style="background-image: none !important">
                 @RenderBody()
             </section>
         </div>
