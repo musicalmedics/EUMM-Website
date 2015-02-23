@@ -11,6 +11,14 @@
         @if (UserHelper.IsSmashing()) {
             <title>Nigel</title>
             <link href="~/favicon2.ico" rel="shortcut icon" type="image/x-icon" />
+            <style type="text/css">
+                .site-title:hover:after {
+                    content: "THE TEMPLE OF NIGEL";
+                }
+                .site-title:hover a {
+                    display: none;
+                }
+            </style>
         }
         else {
             <title>EUMM Music Library</title>

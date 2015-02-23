@@ -55,11 +55,19 @@
     loadInfo(infoIndex)
 </script>
 
+@if (UserHelper.IsSmashing()) {
+<script>
+    info.push(["/Images/nigel_escape.gif", 
+    '<div style="height:216px"><h2>Nigel</h2><p>nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel</p>' +
+    '<p>nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel</p></div>'])
+</script>
+}
+
 @section featured {
 <section class="featured">
     <div class="content-wrapper">
-        <img src="~/Images/icon large.png" style="float: left; margin: 20px" alt="Online" width="72"/>
-        <div>
+        <img src="~/Images/eumm.png" style="float: left; margin: 10px 20px 10px -10px" alt="Online" width="200"/>
+        <div style="display: inline-block; padding-left: 10px">
             <hgroup class="title">
                 <h1>Welcome to the EUMM Online Music Library</h1>
             </hgroup>
@@ -75,7 +83,7 @@
 }
 
 @section infobanner {
-<div id="infobanner" style="background-image: url(Images/tmp/bizet.jpg)">
+<div id="infobanner">
     <div class="arrowL" onclick="infoLeft()"></div>
     <div class="arrowR" onclick="infoRight()"></div>
     <div id="info_host" class="overlay"></div>
