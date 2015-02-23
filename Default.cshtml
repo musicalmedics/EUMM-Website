@@ -3,6 +3,54 @@
     Page.Title = "Home Page";
 }
 
+<script type="text/javascript">
+
+    var infoIndex = 0;
+
+    var info = [
+        ["Images/tmp/bizet.jpg",
+        '<h2>Georges Bizet - Carmen</h2><p style="margin-top:-3px">1838 – 1875</p>' +
+        '<p>Carmen is an opera in four acts by the French composer Georges Bizet. The libretto was written by Henri Meilhac and Ludovic Halévy, based on a novella of the same title by Prosper Mérimée. The opera was first performed at the Opéra-Comique in Paris, on 3 March 1875, and at first was not particularly successful. Its initial run extended to 36 performances, before the conclusion of which Bizet died suddenly, and thus knew nothing of the opera\'s later celebrity.</p>' +
+        '<p>The opera, written in the genre of opéra comique with musical numbers separated by dialogue, tells the story of the downfall of Don José, a naïve soldier who is seduced by the wiles of the fiery Gypsy, Carmen. José abandons his childhood sweetheart and deserts from his military duties, yet loses Carmen\'s love to the glamorous toreador Escamillo, after which José kills her in a jealous rage. ' +
+        '<p>The depictions of proletarian life, immorality and lawlessness, and the tragic death of the main character on stage, broke new ground in French opera and were highly controversial. After the premiere, most reviews were critical, and the French public was generally indifferent.</p>' +
+        '<p style="font-size: smaller">Content sourced from Wikipedia. <a href="http://en.wikipedia.org/wiki/Carmen">Read More.</a></p>'],
+        ["Images/tmp/wicked.jpg",
+        '<h2>Wicked: The Untold Story of the Witches of OZ</h2><p>Wicked: The Untold Story of the Witches of Oz is a musical with music and lyrics by Stephen Schwartz and a book by Winnie Holzman. It is based on the 1995 Gregory Maguire novel Wicked: The Life and Times of the Wicked Witch of the West, an alternative telling of the 1939 film The Wizard of Oz and L. Frank Baum\'s classic 1900 story The Wonderful Wizard of Oz.</p>' +
+        '<p>The musical is told from the perspective of the witches of the Land of Oz; its plot begins before and continues after Dorothy\'s arrival in Oz from Kansas and includes several references to the 1939 film and Baum\'s novel.</p>' +
+        '<p>Wicked tells the story of two unlikely friends, Elphaba (the Wicked Witch of the West) and Glinda the Good, who struggle through opposing personalities and viewpoints, rivalry over the same love-interest, reactions to the Wizard\'s corrupt government, and, ultimately, Elphaba\'s public fall from grace.</p>'+
+        '<p style="font-size: smaller">Content sourced from Wikipedia. <a href="http://en.wikipedia.org/wiki/Wicked_%28musical%29">Read More.</a></p>']
+    ]
+    
+    function loadInfo(index)
+    {
+        if (info.length == 0) return;
+
+        var banner = document.getElementById("infobanner");
+        var host   = document.getElementById("info_host");
+
+        banner.style.backgroundImage = 'url(' + info[index][0] + ')';
+        host.innerHTML               = info[index][1];
+    }
+
+    function infoLeft()
+    {
+        if (--infoIndex == -1) { 
+            infoIndex = info.length - 1;
+        }
+        loadInfo(infoIndex)
+    }
+    function infoRight()
+    {
+        if (++infoIndex == info.length) { 
+            infoIndex = 0;
+        }
+        loadInfo(infoIndex)
+    }
+
+
+    loadInfo(0)
+</script>
+
 @section featured {
 <section class="featured">
     <div class="content-wrapper">
@@ -23,23 +71,10 @@
 }
 
 @section infobanner {
-<div class="infobanner" style="background-image: url(Images/tmp/bizet.jpg)">
-<div class="overlay">
-    <h2>Georges Bizet - Carmen</h2>
-    <p style="margin-top:-3px">1838 – 1875</p>
-    <p>Carmen is an opera in four acts by the French composer Georges Bizet. 
-        The libretto was written by Henri Meilhac and Ludovic Halévy, based on a novella of the same title by Prosper Mérimée. 
-        The opera was first performed at the Opéra-Comique in Paris, on 3 March 1875, and at first was not particularly successful. 
-        Its initial run extended to 36 performances, before the conclusion of which Bizet died suddenly, and thus knew nothing of the opera's later celebrity.</p>
-    <p>
-        The opera, written in the genre of opéra comique with musical numbers separated by dialogue, tells the story of the downfall of Don José, 
-        a naïve soldier who is seduced by the wiles of the fiery Gypsy, Carmen. José abandons his childhood sweetheart and deserts from his military duties, 
-        yet loses Carmen's love to the glamorous toreador Escamillo, after which José kills her in a jealous rage. 
-        
-    <p>The depictions of proletarian life, immorality and lawlessness, and the tragic death of the main character on stage, broke new ground in French opera 
-        and were highly controversial. After the premiere, most reviews were critical, and the French public was generally indifferent.</p>
-    <p style="font-size: smaller">Content sourced from Wikipedia. <a href="http://en.wikipedia.org/wiki/Carmen">Read More.</a></p>
-</div>
+<div id="infobanner" style="background-image: url(Images/tmp/bizet.jpg)">
+    <div class="arrowL" onclick="infoLeft()"></div>
+    <div class="arrowR" onclick="infoRight()"></div>
+    <div id="info_host" class="overlay"></div>
 </div>
 }
 

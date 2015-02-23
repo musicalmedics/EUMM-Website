@@ -1,14 +1,39 @@
-﻿.infobanner {
+﻿#infobanner {
     background-color   : #FFFFFF; 
-    background-size    : 100%; 
+    background-size    : cover; 
     background-repeat  : no-repeat; 
     background-position: center; 
     margin             : 0 auto; 
     padding            : 0px !important; 
     max-width          : 1040px;
+    position           : relative;
 }
 
-.infobanner .overlay {
+#infobanner .arrowL, #infobanner .arrowR {
+    background-size  : 100%;
+    background-repeat: no-repeat;
+    width            : 40px;
+    height           : 100%;
+    position         : absolute;
+    cursor           : pointer;
+}
+#infobanner .arrowL:hover, #infobanner .arrowR:hover {
+    background-color: rgba(0, 0, 0, 0.31);
+}
+
+#infobanner .arrowL {
+    background-image   : url(/Images/arrow_left.png);
+    background-position: left center;
+    padding-left       : -5px;
+}
+#infobanner .arrowR {
+    background-image   : url(/Images/arrow_right.png);
+    background-position: right center;
+    right              : 0;
+    padding-right      : -5px;
+}
+
+#infobanner .overlay {
     background: rgba(255,255,255,.75); 
     padding   : 20px 40px 30px 40px;
 }
