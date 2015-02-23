@@ -5,7 +5,9 @@
 
 <script type="text/javascript">
 
-    var infoIndex = 0;
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min)) + min;
+    }    
 
     var info = [
         ["Images/tmp/bizet.jpg",
@@ -20,6 +22,8 @@
         '<p>Wicked tells the story of two unlikely friends, Elphaba (the Wicked Witch of the West) and Glinda the Good, who struggle through opposing personalities and viewpoints, rivalry over the same love-interest, reactions to the Wizard\'s corrupt government, and, ultimately, Elphaba\'s public fall from grace.</p>'+
         '<p style="font-size: smaller">Content sourced from Wikipedia. <a href="http://en.wikipedia.org/wiki/Wicked_%28musical%29">Read More.</a></p>']
     ]
+
+    var infoIndex = getRandomInt(0, info.length);
     
     function loadInfo(index)
     {
@@ -48,7 +52,7 @@
     }
 
 
-    loadInfo(0)
+    loadInfo(infoIndex)
 </script>
 
 @section featured {
