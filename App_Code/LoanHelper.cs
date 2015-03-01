@@ -144,4 +144,10 @@ public static class LoanHelper
                     partID, member, format, ret.Year, ret.Month, ret.Day, fulfilled)
         );
     }
+
+    public static int CancelRequest(int requestID)
+    {
+        return Database.Open(Website.DBName).Execute(
+            String.Format("DELETE FROM Loans WHERE ID='{0}' AND Fulfilled='0'", requestID.ToString()));
+    }
 }
