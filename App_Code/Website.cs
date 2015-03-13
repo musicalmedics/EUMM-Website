@@ -9,6 +9,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Web;
+using System.Web.SessionState;
 
 
 /// <summary>
@@ -33,6 +34,11 @@ public static partial class Website
         return f.ToString("C2", CultureInfo.CreateSpecificCulture("en-GB"));
     }
 
+    public static HttpSessionState Session
+    {
+        get { return HttpContext.Current.Session; }
+    }
+
     /// <summary>
     /// Sanitises the input string by replacing symbols and control chars 
     /// with underscores. If input is null, returns null.
@@ -44,8 +50,9 @@ public static partial class Website
         var sb = new System.Text.StringBuilder(value.Length);
         foreach (char c in value)
         {
-            if (char.IsControl(c) || char.IsSymbol(c)) sb.Append('_');
-            else                                       sb.Append(c);
+            if      (c == '@')                              sb.Append(c);
+            else if (char.IsControl(c) || char.IsSymbol(c)) sb.Append('_');
+            else                                            sb.Append(c);
         }
         return sb.ToString();
     }

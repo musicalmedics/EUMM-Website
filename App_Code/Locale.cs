@@ -18,7 +18,7 @@ public static class Locale
         messages.Add("en",
             new Dictionary<string, string>()
             {
-                {"ErrorUUN",     "You must specify a valid student number (UUN.)"},
+                {"ErrorUUN",     "You must specify a valid student number (UUN)."},
                 {"ErrorNoPass",  "You must specify a password."},
                 {"ErrorPassLen", "Password must be at least 6 characters."},
                 {"ErrorLogin",   "The student number or password provided is incorrect."},

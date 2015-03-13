@@ -4,6 +4,8 @@ using System.Collections.Specialized;
 using System.Collections.Generic;
 using WebMatrix.Data;
 using WebMatrix.WebData;
+using System.Web.Security;
+using System.Web;
 
 /// <summary>
 /// Summary description for UserHelper
@@ -25,6 +27,12 @@ public static class UserHelper
         if (count == 1) return (bool)(res.First().IsMember);
 
         else throw new Exception("More than one member matches the given UUN");
+    }
+
+    public static dynamic GetMembers(bool showInactive=false)
+    {
+        var db = Database.Open(Website.DBName);
+        return db.Query("SELECT * from Members" + (!showInactive ? " WHERE IsMember='1'":""));
     }
 
     public static bool IsAdmin()
@@ -159,9 +167,35 @@ public static class UserHelper
         return Loans;
     }
 
-    ///<summary>Easter Egg!</summary>
-    public static bool IsSmashing()
+    public static int AddMember(string uun, string fname, string lname, string email,
+                bool member, bool orchestra, bool choir, bool admin)
     {
-        return WebSecurity.CurrentUserName == "s1311545";
+        uun   = Website.Sanitise(uun);
+        fname = Website.Sanitise(fname);
+        lname = Website.Sanitise(lname);
+        email = Website.Sanitise(email);
+
+        if (email != null) email = email.Replace(" ","");
+        if (String.IsNullOrEmpty(email)) email = "NULL";
+
+        var db = Database.Open(Website.DBName);
+
+        return db.Execute(String.Format(
+            "INSERT INTO Members (UUN, FirstName, LastName, Email, IsMember, "+
+            "JoinDate, IsOrchestra, IsChoir, IsAdmin) VALUES "
+            + "('{0}','{1}','{2}',{3},'{4}',GETDATE(),'{5}','{6}','{7}')",
+            
+            uun, fname, lname, email, (member?"1":"0"),(orchestra?"1":"0"),(choir?"1":"0"),(admin?"1":"0")
+        ));
+    }
+
+    ///<summary>Easter Egg!</summary>
+    public static bool IsSmashing
+    {
+        get {
+            return (WebSecurity.CurrentUserName == "s1311545" && (string)Website.Session["smash"] != "False") 
+                || (string)Website.Session["smash"] == "True"; 
+        }
+        set { Website.Session["smash"] = value.ToString(); }
     }
 }

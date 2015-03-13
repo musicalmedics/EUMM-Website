@@ -3,8 +3,12 @@
     <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
 }
 @{
-    Page.Title = "Title goes here";
     Layout     = "~/_SiteLayout.cshtml";
+    Page.Title = "Manage Library";
+
+    if (!UserHelper.IsAdmin()) {
+        Response.RedirectPermanent("~/");
+    }
 
     Validation.RequireField("title", "You must specify the piece title.");
     Validation.RequireField("author", "You must give an author.");
@@ -93,7 +97,7 @@
             </table>
             <br/>
             @Html.ValidationSummary("Please re-enter any incorrect inputs before continuing.", excludeFieldErrors: false, htmlAttributes: null)
-            <input type="submit" value="Add to Database"/>
+            <!--input type="submit" value="Add to Database"/-->
         </form>
     </section>
 </div>

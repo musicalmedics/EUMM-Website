@@ -15,6 +15,8 @@ public static partial class Website
     public static readonly string DBName    = "musicDB";
     public static readonly string Webmaster = "jsrenwick3@gmail.com";
 
+    public static readonly string UUNRegex = @"(^[se]\d{7}$)|([vV]\d{8})";
+
     /// <summary>
     /// Gets the string name describing the format with
     /// the given ID.

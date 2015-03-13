@@ -1,4 +1,13 @@
-﻿<!DOCTYPE html>
+﻿@{
+    if (Request.QueryString["smash"] != null) {
+        UserHelper.IsSmashing = true;
+    }
+    else if (Request.QueryString["desmash"] != null) {
+        UserHelper.IsSmashing = false;
+    }
+}
+
+<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8" />
@@ -8,7 +17,7 @@
         <link href="~/Content/themes/base/jquery.ui.all.css" rel="stylesheet" type="text/css" />
         <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
         <link href="~/Content/controls.css" rel="stylesheet" type="text/css" />
-        @if (UserHelper.IsSmashing()) {
+        @if (UserHelper.IsSmashing) {
             <title>Nigel</title>
             <link href="~/favicon2.ico" rel="shortcut icon" type="image/x-icon" />
             <style type="text/css">
@@ -53,17 +62,8 @@
                     </section>
                     <nav>
                         <ul id="menu">
-                            <li>@if(UserHelper.IsSmashing()) { <a href="~/"><b>N</b>ome</a> } else { <a href="~/">Home</a> }</li>
-                            @if (WebSecurity.IsAuthenticated && UserHelper.IsAdmin())
-                            {
-                                string count = UserHelper.CountRequests().ToString();
-
-                                if(UserHelper.IsSmashing()) {
-                                <li><a href="~/Admin/TODO"><b>I</b>dmin (@count)</a></li>
-                                }
-                                else { <li><a href="~/Admin/TODO">Admin (@count)</a></li> }
-                            }
-                            @if(UserHelper.IsSmashing()) {
+                            <li>@if(UserHelper.IsSmashing) { <a href="~/"><b>N</b>ome</a> } else { <a href="~/">Home</a> }</li>
+                            @if(UserHelper.IsSmashing) {
                             <li><a href="~/MyMusic"><b>G</b>y Music</a></li>
                             <li><a href="~/List"><b>E</b>oncert</a></li>
                             <li><a href="~/Contact"><b>L</b>ontact Us</a></li>
@@ -74,13 +74,29 @@
                             <li><a href="~/Contact">Contact Us</a></li>
                             }
 
-                            @if (UserHelper.IsSmashing()) {
+                            @if (UserHelper.IsSmashing) {
                             <li><a href="http://www.youtube.com/watch?v=j4eBvejTvMg">
                                 <img src="~/Images/smashing.png" style="margin:0px -15px -26px 0px" /></a>
                             </li>
                             }
                         </ul>
                     </nav>
+                    @if (WebSecurity.IsAuthenticated && UserHelper.IsAdmin())
+                    {
+                        string count = UserHelper.CountRequests().ToString();
+                        
+                        <div style="float:right; background-color: #DDD">
+                        <ul id="menu">
+                            <li>Admin&nbsp;&nbsp;</li>
+                            <li><a href="~/Admin/Loans">Loans (@count)</a></li>
+                            <li><a href="~/Admin/Members">Members</a></li>
+                            <li><a href="~/Admin/Library">Library</a></li>
+                            @if (UserHelper.IsSmashing) {
+                                <li><a href="~/Admin/Nigel">Nigel</a></li>
+                            }
+                        </ul>
+                        </div>
+                    }
                 </div>
             </div>
         </header>

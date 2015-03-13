@@ -7,17 +7,6 @@
         function onFirstTimeChange()
         {
             var check = document.getElementById("firstTime");
-
-            /*if (document.getElementById("firstTime").checked)
-            {
-                pwd.style.visibility = "hidden";
-                lbl.style.visibility = "hidden";
-            }
-            else
-            {
-                pwd.style.visibility = "visible";
-                lbl.style.visibility = "visible";
-            }*/
             location.href = "Login?init=" + (check.checked ? "true" : "false");
         };
     </script>
@@ -46,8 +35,8 @@
     // Set up validation
     Validation.RequireField("studentid", Locale.Messages["ErrorUUN"]);
     
-    Validation.Add("studentid", 
-        Validator.Regex(@"(^[se]\d{7}$)|([vV]\d{8})", Locale.Messages["ErrorUUN"]));
+    Validation.Add("studentid", Validator.Regex(Website.UUNRegex, 
+                Locale.Messages["ErrorUUN"]));
 
     // If this is a POST request, validate and process data
     if (IsPost)
@@ -56,7 +45,7 @@
         
         studentid  = Request.Form["studentid"];
         password   = Request.Form["password"];
-        rememberMe = Request.Form["rememberMe"].AsBool();
+        rememberMe = "on".Equals(Request.Form["rememberMe"]);
         firstTime  = Request.Form["firstTime"].AsBool();
 
         // Manage external logins by removing the leading 'v'

@@ -1,0 +1,149 @@
+﻿@using WebMatrix.WebData
+@section Scripts {
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+}
+@{
+    WebSecurity.RequireAuthenticatedUser();
+
+    Layout     = "~/_SiteLayout.cshtml";
+    Page.Title = "Loans";
+
+    if (!UserHelper.IsAdmin()) {
+        Response.Redirect("~/");
+    }
+
+    Validation.RequireField("uun", Locale.Messages["ErrorUUN"]);
+    Validation.Add("uun", Validator.Regex(Website.UUNRegex, Locale.Messages["ErrorUUN"]));
+
+    Validation.RequireField("fname", "You must give a first name.");
+    Validation.RequireField("lname", "You must give a last name.");
+
+    bool errUUN   = !ModelState.IsValidField("uun");
+    bool errFName = !ModelState.IsValidField("fname");
+    bool errLName = !ModelState.IsValidField("lname");
+
+    var db      = Database.Open(Website.DBName);
+    var action  = Request.Form["action"];
+    var members = UserHelper.GetMembers(Request.QueryString.Get("showall") == null);
+
+    if (IsPost)
+    {
+        if (Validation.IsValid())
+        {
+            UserHelper.AddMember(
+                Request.Form["uun"], 
+                Request.Form["fname"], 
+                Request.Form["lname"],
+                Request.Form["email"],
+                true, 
+                "on".Equals(Request.Form["orchestra"]),
+                "on".Equals(Request.Form["choir"].AsBool()), 
+                "on".Equals(Request.Form["admin"].AsBool())
+            );
+            Response.RedirectPermanent("");
+        }
+    }
+}
+
+<script type="text/javascript">
+
+</script>
+
+<hgroup class="title">
+    <h1>Administration.</h1>
+    <h2>Manage Library Membership.</h2>
+</hgroup>
+<br/>
+<section>
+<h2 style="margin-bottom:-15px">Add Member</h2>
+<br/>
+<p>Entries in bold are required. The rest are optional and can be left blank.</p>
+<p>Hover over an input to see a further description.</p>
+
+<form method="post" id="form2">
+<table>
+    <tr title="The member's university username. Must be either 's#######' or '########' format.">
+        <td><b @if (errUUN){ <text> class="error-label" </text> }>University Username</b></td>
+        <td><input type="text" name="uun" @Validation.For("uun")></td>
+    </tr>
+    <tr title="The member's first name.">
+        <td><b @if (errFName){ <text> class="error-label" </text> }>First Name</b></td>
+        <td><input type="text" name="fname" @Validation.For("fname")></td>
+    </tr>
+    <tr title="The member's last name.">
+        <td><b @if (errLName){ <text> class="error-label" </text> }>Last Name</b></td>
+        <td><input type="text" name="lname" @Validation.For("lname")></td>
+    </tr>
+    <tr title="When checked, allows the member access to the orchestral library.">
+        <td><b>Orchestra Member</b></td>
+        <td><input type="checkbox" name="orchestra"></td>
+    </tr>
+    <tr title="When checked, allows the member access to the choral library.">
+        <td><b>Choir Member</b></td>
+        <td><input type="checkbox" name="choir"></td>
+    </tr>
+    <tr title="When checked, permits the member to view and change all library data.">
+        <td><b>Is Administrator</b></td>
+        <td><input type="checkbox" name="admin"></td>
+    </tr>
+    <tr title="The member's email address. Optional.">
+        <td>Email Address</td>
+        <td><input type="text" name="email"/></td>
+    </tr>
+</table>
+@Html.ValidationSummary("Please re-enter any incorrect inputs before continuing.", excludeFieldErrors: false, htmlAttributes: null)
+<br/>
+<input type="submit" value="Add Member" />
+</form>
+</section>
+<br/>
+<section>
+<h2>Current Members</h2>
+<br/>
+<form method="post" id="form">
+<table>
+    <tr>
+        <td><b>UUN</b></td>
+        <td><b>Name</b></td>
+        <td><b>Active</b></td>
+        <td><b>Orchestra</b></td>
+        <td><b>Choir</b></td>
+        <td><b>Admin</b></td>
+        <td><b>Email</b></td>
+    </tr>
+
+    @foreach (var row in members)
+    {
+        var name = row.FirstName + ' ' + row.LastName;
+        <tr>
+            <td>@row.UUN</td>
+            <td>@name</td>
+            @if(row.IsMember) { 
+                <td><input type="checkbox" checked="Checked" name="member"/></td>
+            } else {
+                <td><input type="checkbox" name="member"/></td>
+            }
+            @if(row.IsOrchestra) { 
+                <td><input type="checkbox" checked="Checked" name="orchestra"/></td>
+            } else {
+                <td><input type="checkbox" name="orchestra"/></td>
+            }
+            @if(row.IsChoir) { 
+                <td><input type="checkbox" checked="Checked" name="choir"/></td>
+            } else {
+                <td><input type="checkbox" name="choir"/></td>
+            }
+            @if(row.IsAdmin) { 
+                <td><input type="checkbox" checked="Checked" name="admin"/></td>
+            } else {
+                <td><input type="checkbox" name="admin"/></td>
+            }
+            <td>@row.Email</td>
+        </tr>
+    }
+</table>
+<br/>
+<!--input type="button" value="Update Records" onclick="commitChanges()" /-->
+</form>
+</section>

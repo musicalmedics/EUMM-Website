@@ -3,11 +3,11 @@
     WebSecurity.RequireAuthenticatedUser();
 
     // Ensure member is admin
-    if (!UserHelper.IsAdmin(WebSecurity.CurrentUserName)) {
-        Response.Redirect("~/Account/ExternalLoginFailure");
+    if (!UserHelper.IsAdmin()) {
+        Response.RedirectPermanent("~/Account/ExternalLoginFailure");
     }
     Layout     = "~/_SiteLayout.cshtml";
-    Page.Title = "TODO";
+    Page.Title = "Loans";
 
     var db = Database.Open(Website.DBName);
 
@@ -50,7 +50,7 @@
 </script>
 
 <hgroup class="title">
-    <h1>TODO.</h1>
+    <h1>Administration.</h1>
     <h2>Requests yet to be fulfilled.</h2>
 </hgroup>
 <br/>
@@ -70,7 +70,7 @@
     @foreach (var row in view)
     {
         var title = row.FirstName + ' ' + row.LastName;
-        var name  = UserHelper.IsSmashing()?"Nigel Thornberry":title;
+        var name  = UserHelper.IsSmashing?"Nigel Thornberry":title;
         <tr>
             <td><input type="checkbox" title="Select Row" name=@row.ID /></td>
             <td title="@title">@name</td>
@@ -113,7 +113,7 @@
     @foreach (var row in loans)
     {
         var title = row.FirstName + ' ' + row.LastName;
-        var name  = UserHelper.IsSmashing()?"Nigel Thornberry":title;
+        var name  = UserHelper.IsSmashing?"Nigel Thornberry":title;
         <tr>
             <td><input type="checkbox" title="Select Row" name=@row.ID /></td>
             <td title="@title">@name</td>
