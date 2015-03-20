@@ -35,6 +35,36 @@ public static partial class Website
         return (libraryValue & Website.Library_Orchestra) != 0;
     }
 
+    public static IDictionary<IEnumerable<Library>, IEnumerable<dynamic>> GroupPiecesByLibraries(
+        IEnumerable<dynamic> pieces)
+    {
+        var temp = new Dictionary<int, List<dynamic>>();
+
+        foreach (var piece in pieces)
+        {
+            int lib = piece.Libraries;
+
+            if (!temp.ContainsKey(lib)) {
+                temp.Add(lib, new List<dynamic>());
+            }
+            temp[lib].Add(piece);
+        }
+
+        var output = new Dictionary<IEnumerable<Library>, IEnumerable<dynamic>>();
+
+        foreach (int key in temp.Keys)
+        {
+            var libs = new List<Library>();
+            foreach (var lib in Website.Libraries)
+            {
+                if ((key & lib.ID) != 0) libs.Add(lib);
+            }
+
+            output.Add(libs, temp[key]);
+        }
+        return output;
+    }
+
     /// <summary>
     /// Gets a formatted currency string for the given double value.
     /// </summary>

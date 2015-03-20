@@ -3,6 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
+public class Library
+{
+    public int ID { get; private set; }
+    public string Name { get; private set; }
+
+    public Library(int id, string name)
+    {
+        this.ID   = id;
+        this.Name = name;
+    }
+
+    public override string ToString()
+    {
+        return Locale.Messages[this.Name];
+    }
+}
+
 public static partial class Website
 {
     public const int Library_Orchestra = 1;
@@ -16,6 +33,16 @@ public static partial class Website
     public static readonly string Webmaster = "jsrenwick3@gmail.com";
 
     public static readonly string UUNRegex = @"(^[se]\d{7}$)|([vV]\d{8})";
+
+    private static readonly Library[] libraries = new Library[] 
+    { 
+        new Library(Library_Orchestra, "Orchestra"),
+        new Library(Library_Choir, "Choir") 
+    };
+    /// <summary>
+    /// Get objects giving info on the available libraries.
+    /// </summary>
+    public static IEnumerable<Library> Libraries { get { return libraries; } }
 
     /// <summary>
     /// Gets the string name describing the format with

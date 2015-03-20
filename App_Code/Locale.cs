@@ -33,7 +33,10 @@ public static class Locale
                 {"LatewithFee",  "Late with Fee"},
                 {"FeesDue",      "FeesDue"},
                 {"FeesPaid",     "Fees Paid"},
-                {"Overdue",      "Overdue"}
+                {"Overdue",      "Overdue"},
+                {"Orchestra",    "Orchestra"},
+                {"Choir",        "Choir"},
+                {"and",          "and"}
             });
         Current = messages.First().Key;
     }

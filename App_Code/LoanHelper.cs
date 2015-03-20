@@ -17,7 +17,7 @@ public static class LoanHelper
     public static IEnumerable<dynamic> GetLoanablePieces()
     {
         var db = Database.Open(Website.DBName);
-        var q  = db.Query("SELECT * FROM Pieces WHERE IsPresent='1' AND CanLendParts='1'");
+        var q  = db.Query("SELECT * FROM Pieces WHERE IsPresent='1' AND CanLendParts='1' ORDER BY Title");
 
         dynamic user = UserHelper.GetUser();
 
