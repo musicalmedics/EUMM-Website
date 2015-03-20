@@ -5,8 +5,8 @@ using System.Web;
 
 public static partial class Website
 {
-    public const int Library_Orchestra = 0;
-    public const int Library_Choir     = 1;
+    public const int Library_Orchestra = 1;
+    public const int Library_Choir     = 2;
 
     public const int Format_Original    = 0;
     public const int Format_PaperCopy   = 1;
@@ -28,6 +28,7 @@ public static partial class Website
             case 0:  return Locale.Messages["Original"];
             case 1:  return Locale.Messages["PaperCopy"];
             case 2:  return Locale.Messages["Digital"];
+            case 3:  return Locale.Messages["Recording"];
             default: return Locale.Messages["Other"];
         }
     }

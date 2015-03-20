@@ -20,7 +20,7 @@ public static class UserHelper
     {
         // Open the database & look for a member
         var db  = Database.Open(Website.DBName);
-        var res = db.Query("SELECT * FROM Members WHERE UUN='" + Website.Sanitise(studentID) + "'");
+        var res = db.Query("SELECT * FROM Members WHERE UUN=@0", studentID);
 
         int count = res.Count();
         if (count == 0) return false;
@@ -43,7 +43,7 @@ public static class UserHelper
     {
         // Open the database & look for the member
         var db  = Database.Open(Website.DBName);
-        var res = db.Query("SELECT * FROM Members WHERE UUN='" + Website.Sanitise(studentID) + "'");
+        var res = db.Query("SELECT * FROM Members WHERE UUN=@0", studentID);
 
         int count = res.Count();
         if (count == 0) return false;
@@ -57,14 +57,13 @@ public static class UserHelper
         // Open the database & look for the user
         var db = Database.Open(Website.DBName);
 
-        return db.QuerySingle("SELECT * FROM Members WHERE UUN='" + 
-            WebSecurity.CurrentUserName + "'");
+        return db.QuerySingle("SELECT * FROM Members WHERE UUN=@0", WebSecurity.CurrentUserName);
     }
     public static dynamic GetUser(string studentID)
     {
         // Open the database & look for the user
         var db  = Database.Open(Website.DBName);
-        return db.QuerySingle("SELECT * FROM Members WHERE UUN='" + Website.Sanitise(studentID) + "'");
+        return db.QuerySingle("SELECT * FROM Members WHERE UUN=@0", studentID);
     }
 
     public static int ConfirmUser(string studentID, NameValueCollection form)
@@ -80,9 +79,8 @@ public static class UserHelper
         if (lastName.Length > 50)  lastName  = lastName.Remove(50);
 
         // Update member record
-        return db.Execute(String.Format(
-            "UPDATE Members SET FirstName='{0}',LastName='{1}',Email='{2}' WHERE UUN='{3}'",
-            firstName, lastName, Website.Sanitise(form["email"]), Website.Sanitise(studentID)));
+        return db.Execute("UPDATE Members SET FirstName=@0,LastName=@1,Email=@2 WHERE UUN=@3",
+            firstName, lastName, form["email"], studentID);
     }
 
     public static int CountRequests()
@@ -98,11 +96,12 @@ public static class UserHelper
             return db.QueryValue("SELECT COUNT(*) FROM [New Loan Requests - Simple]");
         }
         else if (user.IsOrchestra) {
-            return db.QueryValue("SELECT COUNT(*) FROM [New Loan Requests - Simple] WHERE [Library]='0'");
+            return db.QueryValue("SELECT COUNT(*) FROM [New Loan Requests - Simple] WHERE [Libraries] & @0 != 0", Website.Library_Orchestra);
         }
-        else /*if (user.IsChoir) */ {
-            return db.QueryValue("SELECT COUNT(*) FROM [New Loan Requests - Simple] WHERE [Library]='1'");
+        else if (user.IsChoir) {
+            return db.QueryValue("SELECT COUNT(*) FROM [New Loan Requests - Simple] WHERE [Libraries] & @0 != 0", Website.Library_Choir);
         }
+        else return 0;
     }
 
     public static IEnumerable<dynamic> GetRequests()
@@ -118,11 +117,13 @@ public static class UserHelper
             return db.Query("SELECT * FROM [New Loan Requests - Simple]");
         }
         else if (user.IsOrchestra) {
-            return db.Query("SELECT * FROM [New Loan Requests - Simple] WHERE [Library]='0'");
+            return db.Query("SELECT * FROM [New Loan Requests - Simple] WHERE [Libraries] & @0 != 0", Website.Library_Orchestra);
         }
-        else /*if (user.IsChoir) */ {
-            return db.Query("SELECT * FROM [New Loan Requests - Simple] WHERE [Library]='1'");
+        else if (user.IsChoir) {
+            return db.Query("SELECT * FROM [New Loan Requests - Simple] WHERE [Libraries] & @0 != 0", Website.Library_Choir);
         }
+        // Return empty set
+        else return db.Query("SELECT * FROM [New Loan Requests - Simple] WHERE 1 = 0");
     }
 
     public static dynamic GetCurrentLoans(string studentID)
@@ -131,17 +132,15 @@ public static class UserHelper
         var db = Database.Open(Website.DBName);
 
         // Perform the query
-        var q = db.Query("SELECT * FROM Loans WHERE Member='" + 
-            Website.Sanitise(studentID) + "' AND Returned='0'");
+        var q = db.Query("SELECT * FROM Loans WHERE Member=@0 AND Returned='0'", studentID);
 
         var Loans = Website.ExpandoFromTable(q);
 
         // Query for relations
         foreach (var row in Loans)
         {
-            row.Part = Website.ExpandoFromRow(db.QuerySingle(
-                "SELECT * FROM Parts WHERE ID='" + row.Part + "'"));
-            row.Part.Piece = db.QuerySingle("SELECT * FROM Pieces WHERE ID='" + row.Part.Piece + "'");
+            row.Part = Website.ExpandoFromRow(db.QuerySingle("SELECT * FROM Parts WHERE ID=@0", row.Part));
+            row.Part.Piece = db.QuerySingle("SELECT * FROM Pieces WHERE ID=@0", row.Part.Piece);
         }
         return Loans;
     }    
@@ -152,17 +151,15 @@ public static class UserHelper
         var db = Database.Open(Website.DBName);
 
         // Perform the query
-        var q = db.Query("SELECT * FROM Loans WHERE Member='" + 
-            Website.Sanitise(studentID) + "' AND Returned='1'");
+        var q = db.Query("SELECT * FROM Loans WHERE Member=@0 AND Returned='1'", studentID);
 
         var Loans = Website.ExpandoFromTable(q);
 
         // Query for relations
         foreach (var row in Loans)
         {
-            row.Part = Website.ExpandoFromRow(db.QuerySingle(
-                "SELECT * FROM Parts WHERE ID='" + row.Part + "'"));
-            row.Part.Piece = db.QuerySingle("SELECT * FROM Pieces WHERE ID='" + row.Part.Piece + "'");
+            row.Part = Website.ExpandoFromRow(db.QuerySingle("SELECT * FROM Parts WHERE ID=@0", row.Part));
+            row.Part.Piece = db.QuerySingle("SELECT * FROM Pieces WHERE ID=@0", row.Part.Piece);
         }
         return Loans;
     }
@@ -170,20 +167,14 @@ public static class UserHelper
     public static int AddMember(string uun, string fname, string lname, string email,
                 bool member, bool orchestra, bool choir, bool admin)
     {
-        uun   = Website.Sanitise(uun);
-        fname = Website.Sanitise(fname);
-        lname = Website.Sanitise(lname);
-        email = Website.Sanitise(email);
-
         if (email != null) email = email.Replace(" ","");
-        if (String.IsNullOrEmpty(email)) email = "NULL";
+        if (String.Empty == email) email = null;
 
         var db = Database.Open(Website.DBName);
 
         return db.Execute(String.Format(
-            "INSERT INTO Members (UUN, FirstName, LastName, Email, IsMember, "+
-            "JoinDate, IsOrchestra, IsChoir, IsAdmin) VALUES "
-            + "('{0}','{1}','{2}',{3},'{4}',GETDATE(),'{5}','{6}','{7}')",
+            @"INSERT INTO Members (UUN, FirstName, LastName, Email, IsMember, 
+            JoinDate, IsOrchestra, IsChoir, IsAdmin) VALUES (@0,@1,@2,@3,@4,GETDATE(),@5,@6,@7)",
             
             uun, fname, lname, email, (member?"1":"0"),(orchestra?"1":"0"),(choir?"1":"0"),(admin?"1":"0")
         ));

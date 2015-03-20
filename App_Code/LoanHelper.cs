@@ -22,8 +22,8 @@ public static class LoanHelper
         dynamic user = UserHelper.GetUser();
 
         // Filter pieces by whether the user is a member of that library
-        return q.Where((p) => (p.Library == 0 && user.IsOrchestra) 
-            || (p.Library == 1 && user.IsChoir));
+        return q.Where((p) => (Website.IsOrchestra(p.Libraries) && user.IsOrchestra)
+            || (Website.IsChoir(p.Libraries) && user.IsChoir));
     }
 
     public static IEnumerable<dynamic> GetCurrentLoans(string partID)
@@ -31,7 +31,7 @@ public static class LoanHelper
         int.Parse(partID); // Validate input
 
         var db = Database.Open(Website.DBName);
-        return db.Query("SELECT * FROM Loans WHERE Returned='0' AND Part='" + partID + "'");
+        return db.Query("SELECT * FROM Loans WHERE Returned='0' AND Part=@0", partID);
     }
 
     public static IEnumerable<dynamic> GetAllCurrentLoans()
@@ -47,11 +47,13 @@ public static class LoanHelper
             return db.Query("SELECT * FROM [Loans - Simple] ORDER BY [LoanStart] DESC");
         }
         else if (user.IsOrchestra) {
-            return db.Query("SELECT * FROM [Loans - Simple] WHERE [Library]='0' ORDER BY [LoanStart] DESC");
+            return db.Query("SELECT * FROM [Loans - Simple] WHERE [Libraries] & @0 != 0 ORDER BY [LoanStart] DESC", Website.Library_Orchestra);
         }
-        else /*if (user.IsChoir) */ {
-            return db.Query("SELECT * FROM [Loans - Simple] WHERE [Library]='1' ORDER BY [LoanStart] DESC");
+        else if (user.IsChoir) {
+            return db.Query("SELECT * FROM [Loans - Simple] WHERE [Libraries] & @1 != 0 ORDER BY [LoanStart] DESC", Website.Library_Choir);
         }
+        // Return empty set
+        return db.Query("SELECT * FROM [Loans - Simple] WHERE 1 = 0");
     }
 
     public static bool IsRenting(IEnumerable<dynamic> loans)
@@ -64,12 +66,12 @@ public static class LoanHelper
         int.Parse(pieceID); // Validate input
 
         var db = Database.Open(Website.DBName);
-        var q  = db.Query("SELECT * FROM Parts WHERE Piece='" + pieceID + "' ORDER BY "+orderBy);
+        var q  = db.Query("SELECT * FROM Parts WHERE Piece=@0 ORDER BY "+orderBy, pieceID);
 
         dynamic Parts = Website.ExpandoFromTable(q);
 
         foreach (var part in Parts) {
-            part.Piece = db.QuerySingle("SELECT * FROM Pieces WHERE ID='" + part.Piece + "'");
+            part.Piece = db.QuerySingle("SELECT * FROM Pieces WHERE ID=@0", part.Piece);
         }
         return Parts;
     }
@@ -78,16 +80,13 @@ public static class LoanHelper
     {
         var loans = GetCurrentLoans(part.ID.ToString());
 
-        // Check if the user is actually a member of the piece's library
-        if (part.Piece.Library == Website.Library_Orchestra 
-            && !UserHelper.GetUser().IsOrchestra) {
-            return false;
-        }
-        if (part.Piece.Library == Website.Library_Choir
-            && !UserHelper.GetUser().IsChoir) {
-            return false;
-        }
+        int libraries = (UserHelper.GetUser().IsOrchestra ? Website.Library_Orchestra : 0) |
+            (UserHelper.GetUser().IsChoir ? Website.Library_Choir : 0);
 
+        // Check if user's available libraries contain the part
+        if ((libraries & part.Piece.Libraries) == 0) {
+            return false;
+        }
         // Check if the user already has the part on loan and it's not public domain
         if (part.Count != null && IsRenting(loans)) return false;
 
@@ -101,16 +100,16 @@ public static class LoanHelper
 
         Database db = Database.Open(Website.DBName);
 
-        var tokens = db.Query(String.Format("SELECT * FROM DlTokens WHERE Part='{0}' AND Member='{1}'",
-            partID, WebSecurity.CurrentUserName));
+        var tokens = db.Query("SELECT * FROM DlTokens WHERE Part=@0 AND Member=@1",
+            partID, WebSecurity.CurrentUserName);
 
         if (!tokens.Any()) {
             throw new Exception("No valid download token for this part");
         }
         var token = tokens.First();
-        db.Execute("DELETE FROM DlTokens WHERE Token='"+token.Token+"'");
+        db.Execute("DELETE FROM DlTokens WHERE Token=@0", token.Token);
 
-        return db.QueryValue("SELECT DigitalCopyPath FROM Parts WHERE ID='"+partID+"'");
+        return db.QueryValue("SELECT DigitalCopyPath FROM Parts WHERE ID=@0", partID);
     }
 
     public static int CreateLoan(string partID, string format, DateTime returnDate)
@@ -132,22 +131,21 @@ public static class LoanHelper
             fulfilled = '1'; // Digital copies are automatically fulfilled
 
             // Add digital download token for that type and user
-            int i = db.Execute(String.Format("INSERT INTO DlTokens (Member, Part) VALUES ('{0}','{1}')",
-                member, partID));
+            int i = db.Execute("INSERT INTO DlTokens (Member, Part) VALUES (@0, @1)", member, partID);
         }
 
         return db.Execute(String.Format
         (
-            "INSERT INTO Loans (Part,Member,Format,LoanStart,LoanEnd,Fulfilled) " +
-                    "VALUES ('{0}','{1}','{2}',GETDATE(),'{3}-{4}-{5}','{6}')",
+            @"INSERT INTO Loans (Part,Member,Format,LoanStart,LoanEnd,Fulfilled)
+                    VALUES (@0,@1,@2,GETDATE(),'{0}-{1}-{2}',@3)", ret.Year, ret.Month, ret.Day), 
 
-                    partID, member, format, ret.Year, ret.Month, ret.Day, fulfilled)
+            partID, member, format, fulfilled
         );
     }
 
     public static int CancelRequest(int requestID)
     {
-        return Database.Open(Website.DBName).Execute(
-            String.Format("DELETE FROM Loans WHERE ID='{0}' AND Fulfilled='0'", requestID.ToString()));
+        return Database.Open(Website.DBName)
+            .Execute("DELETE FROM Loans WHERE ID=@0 AND Fulfilled='0'", requestID);
     }
 }

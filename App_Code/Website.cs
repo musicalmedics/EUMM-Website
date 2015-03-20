@@ -1,6 +1,6 @@
 ﻿/* Website.cs - (c) James S Renwick 2014
  * -------------------------------------
- * Version 1.1.1
+ * Version 1.2.0
  */
 using System;
 using System.Collections.Generic;
@@ -24,6 +24,15 @@ public static partial class Website
     {
         if (!cond) return "style=visibility:hidden";
         else       return "style=visibility:visible";
+    }
+
+    public static bool IsChoir(int libraryValue)
+    {
+        return (libraryValue & Website.Library_Choir) != 0;
+    }
+    public static bool IsOrchestra(int libraryValue)
+    {
+        return (libraryValue & Website.Library_Orchestra) != 0;
     }
 
     /// <summary>

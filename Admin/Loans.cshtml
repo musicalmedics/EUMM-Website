@@ -21,10 +21,10 @@
             if (int.TryParse(key, out id))
             {
                 if (action == "fulfil") {
-                    db.Execute("UPDATE Loans SET Fulfilled='1' WHERE ID='"+key+"'");
+                    db.Execute("UPDATE Loans SET Fulfilled='1' WHERE ID=@0", key);
                 }
                 else if (action == "return") {
-                    db.Execute("UPDATE Loans SET Returned='1', ReturnedOn=GETDATE() WHERE ID='"+key+"'");
+                    db.Execute("UPDATE Loans SET Returned='1', ReturnedOn=GETDATE() WHERE ID=@0", key);
                 }
             }
         }

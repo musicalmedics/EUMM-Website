@@ -7,7 +7,7 @@
         
         // Verify that return is possible
         var db  = Database.Open(Website.DBName);
-        var res = db.QuerySingle("SELECT * FROM Loans WHERE ID='" + id + "'");
+        var res = db.QuerySingle("SELECT * FROM Loans WHERE ID=@0", id);
         
         if (res.Format == 0) {
             throw new Exception("Attempt made to return original copy online.");
@@ -16,7 +16,7 @@
             throw new Exception("Cannot return item - item already returned");
         }
 
-        db.Execute("UPDATE Loans SET Returned='1', ReturnedOn=GETDATE() WHERE ID='" + id + "'");
+        db.Execute("UPDATE Loans SET Returned='1', ReturnedOn=GETDATE() WHERE ID=@0", id);
         Response.Redirect("~/MyMusic");
         return;
     }

@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-/// <summary>
-/// Summary description for Locale
-/// </summary>
 public static class Locale
 {
     static string name;
@@ -27,6 +24,7 @@ public static class Locale
                 {"Original",     "Original"},
                 {"PaperCopy",    "Paper Copy"},
                 {"Digital",      "Digital"},
+                {"Recording",    "Recording"},
                 {"Other",        "Other"},
                 {"Preparing",    "Preparing"},
                 {"Cancelled",    "Cancelled"},
