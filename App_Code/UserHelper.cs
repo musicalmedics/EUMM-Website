@@ -172,12 +172,11 @@ public static class UserHelper
 
         var db = Database.Open(Website.DBName);
 
-        return db.Execute(String.Format(
-            @"INSERT INTO Members (UUN, FirstName, LastName, Email, IsMember, 
+        return db.Execute(@"INSERT INTO Members (UUN, FirstName, LastName, Email, IsMember, 
             JoinDate, IsOrchestra, IsChoir, IsAdmin) VALUES (@0,@1,@2,@3,@4,GETDATE(),@5,@6,@7)",
             
             uun, fname, lname, email, (member?"1":"0"),(orchestra?"1":"0"),(choir?"1":"0"),(admin?"1":"0")
-        ));
+        );
     }
 
     ///<summary>Easter Egg!</summary>
