@@ -62,17 +62,11 @@
                     </section>
                     <nav>
                         <ul id="menu">
-                            <li>@if(UserHelper.IsSmashing) { <a href="~/"><b>N</b>ome</a> } else { <a href="~/">Home</a> }</li>
-                            @if(UserHelper.IsSmashing) {
-                            <li><a href="~/MyMusic"><b>G</b>y Music</a></li>
-                            <li><a href="~/List"><b>E</b>oncert</a></li>
-                            <li><a href="~/Contact"><b>L</b>ontact Us</a></li>
-                            }
-                            else {
+                            <li><a href="~/">Home</a></li>
                             <li><a href="~/MyMusic">My Music</a></li>
+                            <li><a href="~/Recordings">Recordings</a></li>
                             <li><a href="~/List">Concert</a></li>
                             <li><a href="~/Contact">Contact Us</a></li>
-                            }
 
                             @if (UserHelper.IsSmashing) {
                             <li><a href="http://www.youtube.com/watch?v=j4eBvejTvMg">

@@ -1,0 +1,73 @@
+﻿@{
+    Page.Title = "Recordings";
+    Layout     = "~/_SiteLayout.cshtml";
+}
+
+<style>
+    .video-host {
+        box-shadow: #555 0 0 5px;
+        padding   : 25px;
+    }
+        .video-host h2 {
+            margin-bottom: 40px;
+        }
+</style>
+
+<div>
+    <hgroup class="title">
+        <h1>Recordings.</h1>
+        <h2>Audio clips and videos of pieces.</h2>
+    </hgroup>
+
+    <br/>
+
+    <section class="video-host">
+        <h2>Game of Thrones  <small> - Ramin Djawadi</small></h2>
+        <h3>Note: This is a Sibelius export and as such has problems with some dynamics.</h3>
+        <br />
+        <h4>Full Orchestra</h4>
+        <div>
+            <audio controls>
+              <source src="~/Content/audio/got_full.mp3" type="audio/mpeg">
+              <source src="~/Content/audio/got_full.ogg" type="audio/ogg">
+
+              Your browser does not support the audio element. <br />
+              If possible, please upgrade or switch to a more modern browser. 
+              Otherwise, <a href="~/Contact">contact</a> the librarian team for assistance.
+            </audio>
+        </div>
+
+
+    </section>
+
+    <br />
+    <br />
+
+    <section class="video-host">
+        <h2>Lord of The Rings - The Two Towers<small> - Howard Shore</small></h2>
+        <div>
+            <iframe width="420" height="315" src="https://www.youtube.com/embed/R-4nH1ajQJY" frameborder="0"></iframe>
+        </div>
+    </section>
+
+    <br />
+    <br />
+
+    <section class="video-host">
+        <h2>The Blue Danube <small> - Johann Strauss II</small></h2>
+        <div>
+            <iframe width="420" height="315" src="https://www.youtube.com/embed/_CTYymbbEL4" frameborder="0"></iframe>
+        </div>
+    </section>
+
+    <br />
+    <br />
+
+    <section class="video-host">
+        <h2>Carmen Suite 1 <small> - Georges Bizet</small></h2>
+        <div>
+            <iframe width="560" height="315" src="https://www.youtube.com/embed/hh7dxdlTPU8" frameborder="0"></iframe>
+        </div>
+    </section>
+
+</div>
