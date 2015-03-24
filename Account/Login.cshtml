@@ -26,7 +26,7 @@
     // Initialize general page variables
     var studentid  = "";
     var password   = "";
-    var rememberMe = false;
+    var rememberMe = true;
     var firstTime  = Request.QueryString["init"].AsBool(false);
     
     var returnUrl = Request.QueryString["ReturnUrl"];
@@ -135,11 +135,11 @@
                     @Html.ValidationMessage("password")
                 </li>
                 <li class="remember-me">
-                    <input type="checkbox" id="firstTime" name="firstTime" value="true" checked="@firstTime" onchange="onFirstTimeChange()" />
+                    <input type="checkbox" id="firstTime" name="firstTime" checked="@firstTime" onchange="onFirstTimeChange()" />
                     <label class="checkbox" for="firstTime">This is my first time here.</label>
                 </li>
                 <li class="remember-me">
-                    <input type="checkbox" id="rememberMe" name="rememberMe" value="true" checked="@rememberMe" />
+                    <input type="checkbox" id="rememberMe" name="rememberMe" checked="@rememberMe" />
                     <label class="checkbox" for="rememberMe">Save my login for next time.</label>
                 </li>
                 
