@@ -1,6 +1,6 @@
 ﻿@{
     Page.Title = "Title goes here";
-    Layout     = "~/_SiteLayout.cshtml";
+    Layout     = "~/Library/_SiteLayout.cshtml";
     
     if (!WebSecurity.IsAuthenticated)
     {
@@ -47,7 +47,7 @@
                 <td>
                     <!--If a paper or digital copy, allow "returning" online-->
                     @if (row.Format == 1 || row.Format == 2) { 
-                    <a href="~/Return?id=@row.ID" title="Click to return this copy">Return</a>
+                    <a href="~/Library/Return?id=@row.ID" title="Click to return this copy">Return</a>
                     }
                 </td>
             </tr>
@@ -57,7 +57,7 @@
     </section>
     <br />
     <input type="button" value="Request New Loan"
-           onclick="document.location.href='/Loan'" />
+           onclick="document.location.href='/Library/Loan'" />
     <br/>
     <section>
         <h2 style="margin-bottom:-15px">Previous Loans</h2>

@@ -13,13 +13,13 @@
 }
 
 @{
-    Layout     = "~/_SiteLayout.cshtml";
+    Layout     = "~/Library/_SiteLayout.cshtml";
     Page.Title = "Log in";
     
     // If already logged-in, just go to MyMusic
     if (WebSecurity.IsAuthenticated)
     {
-        Response.Redirect("~/MyMusic");
+        Response.Redirect("~/Library/MyMusic");
         return;
     }
 
@@ -30,7 +30,7 @@
     var firstTime  = Request.QueryString["init"].AsBool(false);
     
     var returnUrl = Request.QueryString["ReturnUrl"];
-    if (returnUrl.IsEmpty()) { returnUrl = Href("~/MyMusic"); }
+    if (returnUrl.IsEmpty()) { returnUrl = Href("~/Library/MyMusic"); }
     
     // Set up validation
     Validation.RequireField("studentid", Locale.Messages["ErrorUUN"]);

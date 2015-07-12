@@ -1,6 +1,6 @@
 ﻿@{
     Page.Title = "Loan";
-    Layout = "~/_SiteLayout.cshtml";
+    Layout = "~/Library/_SiteLayout.cshtml";
 
     // Make sure we're logged in before continuing
     if (!WebSecurity.IsAuthenticated)
@@ -54,12 +54,12 @@
                 // Perform download of resource if available
                 if (format == Website.Format_DigitalCopy.ToString())
                 {
-                    Response.Redirect("~/ThankYou?err=Download&dl=" + part); return;
+                    Response.Redirect("~/Library/ThankYou?err=Download&dl=" + part); return;
                 }
                 // Otherwise, just display thank you page
-                else { Response.Redirect("~/ThankYou?err=Success"); return; }
+                else { Response.Redirect("~/Library/ThankYou?err=Success"); return; }
             }
-            else { Response.Redirect("~/ThankYou?err=ReqInvalid"); return; }
+            else { Response.Redirect("~/Library/ThankYou?err=ReqInvalid"); return; }
         }
     }
 }
@@ -120,7 +120,7 @@
                     </p>
                     <p>
                         For digital or paper copies, you must return your current copy before
-                        continuing. This may be able to be performed <a href="~/MyMusic">online</a>.
+                        continuing. This may be able to be performed <a href="~/Library/MyMusic">online</a>.
                     </p>
                     }
                     else if (partRecord.Count != null && loans.Count() >= partRecord.Count)
@@ -130,7 +130,7 @@
                             currently on loan.
                         </p>
                         <p>
-                            Please try again later or <a href="~/Contact">contact</a> your librarian for
+                            Please try again later or <a href="~/Library/Contact">contact</a> your librarian for
                             assistance if urgent.
                         </p>
                     }
@@ -150,7 +150,7 @@
                         </div>
                         <br />
 
-                        <h3>Please make sure that you have read the <a href="~/Legal">terms of service</a> before continuing.</h3>
+                        <h3>Please make sure that you have read the <a href="~/Library/Legal">terms of service</a> before continuing.</h3>
                         <br />
                                 if (partRecord.Deposit > 0)
                                 {

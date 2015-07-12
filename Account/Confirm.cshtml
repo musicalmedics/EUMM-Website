@@ -1,5 +1,5 @@
 ﻿@{
-    Layout     = "~/_SiteLayout.cshtml";
+    Layout     = "~/Library/_SiteLayout.cshtml";
     Page.Title = "Your Details";
 
     string studentid = Request.QueryString["sid"];
@@ -74,7 +74,7 @@
             // Now log in
             WebSecurity.Login(studentid, Request.Form["password"]);
 
-            Response.Redirect("~/MyMusic");
+            Response.Redirect("~/Library/MyMusic");
             return;
         }
     }

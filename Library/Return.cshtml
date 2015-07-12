@@ -1,5 +1,5 @@
 ﻿@{
-    Layout = "~/_SiteLayout.cshtml";
+    Layout = "~/Library/_SiteLayout.cshtml";
     
     if (IsPost)
     {        
@@ -17,7 +17,7 @@
         }
 
         db.Execute("UPDATE Loans SET Returned='1', ReturnedOn=GETDATE() WHERE ID=@0", id);
-        Response.Redirect("~/MyMusic");
+        Response.Redirect("~/Library/MyMusic");
         return;
     }
 }
@@ -42,11 +42,11 @@
         <p>
         I take full responsibility for copyright infringement where 
         such infringement is due to my actions and where it is in contradiction
-        with the <a href="~/Legal">terms of use of this service</a>. 
+        with the <a href="~/Library/Legal">terms of use of this service</a>. 
         </p>
         <p>
         By clicking 'Agree and Return', I am acknowledging that I have acted in accordance with
-        the <a href="~/Legal">terms of use of this service</a> and copyright law as it 
+        the <a href="~/Library/Legal">terms of use of this service</a> and copyright law as it 
         exists in this country.
         </p>
     </section>
@@ -55,7 +55,7 @@
     <section>
         <form method="post">
             <input type="submit" value="Agree and Return" />
-            <input type="button" value="Cancel" onclick="document.location.href='/MyMusic'" />
+            <input type="button" value="Cancel" onclick="document.location.href='~/Library/MyMusic'" />
         </form>
     </section>
 

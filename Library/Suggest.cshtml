@@ -4,7 +4,7 @@
 }
 @{
     Page.Title = "Piece Suggestions";
-    Layout     = "~/_SiteLayout.cshtml";
+    Layout     = "~/Library/_SiteLayout.cshtml";
 
     bool errTitle = false;
 
@@ -110,7 +110,7 @@
             <li class="suggestion">
                 <div class="suggest">
                     <h3>@entry.Title</h3><p>@if (entry.IsChoir) { <text>Choir &nbsp;</text> } 
-                    @if (entry.IsOrchestra) { <text>Orchestra</text> }</p>
+                    @if (entry.IsOrchestra) { <text>Orchestra</text> } &nbsp;</p>
                 </div>
                 <div class="buttons">
                     <img class="button" src="~/Images/thumb.png" title="Endorse/Unendorse suggestion" data-id="@entry.Suggestion" onclick="endorse(this)" 

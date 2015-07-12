@@ -6,7 +6,7 @@
     if (!UserHelper.IsAdmin()) {
         Response.RedirectPermanent("~/Account/ExternalLoginFailure");
     }
-    Layout     = "~/_SiteLayout.cshtml";
+    Layout     = "~/Library/_SiteLayout.cshtml";
     Page.Title = "Loans";
 
     var db = Database.Open(Website.DBName);

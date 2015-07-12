@@ -12,7 +12,7 @@
     <head>
         <meta charset="utf-8" />
         <meta name="robots" content="nosnippet" />
-        <meta name="description" content="Edinburgh University Musical Medics."/>
+        <meta name="description" content="Edinburgh University Musical Medics Online Music Library."/>
 
         <link href="~/Content/themes/base/jquery.ui.all.css" rel="stylesheet" type="text/css" />
         <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
@@ -30,7 +30,7 @@
             </style>
         }
         else {
-            <title>Musical Medics</title>
+            <title>EUMM Music Library</title>
             <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
         }
         <script src="~/Scripts/jquery-1.8.2.min.js"></script>
@@ -38,11 +38,11 @@
         <script src="~/Scripts/modernizr-2.6.2.js"></script>
         <meta name="viewport" content="width=device-width" />
     </head>
-    <body data-site="main">
+    <body data-site="library">
         <header>
             <div class="content-wrapper">
                 <div class="float-left">
-                    <p class="site-title"><a href="~/">Edinburgh University Musical Medics</a></p>
+                    <p class="site-title"><a href="~/Library/">EUMM Library</a></p>
                 </div>
                 <div class="float-right">
                     <section id="login">
@@ -62,13 +62,11 @@
                     </section>
                     <nav>
                         <ul id="menu">
-                            <li><a href="~/index">Home</a></li>
-                            <li><a href="~/Library">Online Library</a></li>
-                            <li><a href="~/Events">Events</a></li>
-                            <li><a href="~/Concert">Concerts</a></li>
-                            <li><a href="~/Charities">Charities</a></li>
-                            <li><a href="~/Gallery">Gallery</a></li>
-                            <li><a href="~/AboutUs">About Us</a></li>
+                            <li><a href="~/">Home</a></li>
+                            <li><a href="~/Library/">Online Library</a></li>
+                            <li><a href="~/Library/MyMusic">My Music</a></li>
+                            <li><a href="~/Library/Suggest">Suggestions</a></li>
+                            <li><a href="~/Library/Contact">Contact Us</a></li>
 
                             @if (UserHelper.IsSmashing) {
                             <li><a href="http://www.youtube.com/watch?v=j4eBvejTvMg">
@@ -103,6 +101,17 @@
                 @RenderBody()
             </section>
         </div>
+        <footer>
+            <div class="content-wrapper">
+                <div class="float-left">
+                    <p>&copy; @DateTime.Now.Year - James S Renwick</p>
+                    <p><a></a></p>
+                </div>
+                <div class="float-right">
+                    <p><a href="~/Library/Legal">The Legal Bit</a></p>
+                </div>
+            </div>
+        </footer>
         @RenderSection("Scripts", required: false)
     </body>
 </html>

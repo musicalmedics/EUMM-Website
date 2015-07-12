@@ -1,7 +1,7 @@
 ﻿@{
     // Redirect to error if not authenticated
     if (!WebSecurity.IsAuthenticated || !UserHelper.IsAdmin()) { 
-        Response.RedirectPermanent("~/ThankYou"); return; 
+        Response.RedirectPermanent("~/Library/ThankYou"); return; 
     }
 
     var action = Request.QueryString["action"];

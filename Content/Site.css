@@ -13,6 +13,12 @@ body {
     margin: 0;
     padding: 0;
 }
+body[data-site="main"] {
+    border-top: solid 10px #A12904;
+}
+body[data-site="library"] {
+    border-top: solid 10px #8DC9DF;
+}
 
 a {
     color: #333;
@@ -98,6 +104,13 @@ h5, h6 {
     max-width: 960px;
 }
 
+img.banner {
+    display  : block;
+    margin   : 0 auto;
+    max-width: 1040px;
+    width    : 100%
+}
+
 #body {
     background-color: #efeeef;
     clear: both;
@@ -105,13 +118,8 @@ h5, h6 {
 }
 
     .main-content {
-        background: url("../Images/accent.png") no-repeat;
         padding-left: 10px;
         padding-top: 30px;
-    }
-
-    .featured + .main-content {
-        background: url("../Images/heroAccent.png") no-repeat;
     }
 
 header .content-wrapper {
@@ -213,13 +221,24 @@ ul#menu {
     background-color: #fff;
 }
 
-    .featured .content-wrapper {
+    body[data-site="library"] .featured .content-wrapper {
         background-color: #7ac0da;
         background-image: -ms-linear-gradient(left, #7ac0da 0%, #a4d4e6 100%);
         background-image: -o-linear-gradient(left, #7ac0da 0%, #a4d4e6 100%);
         background-image: -webkit-gradient(linear, left top, right top, color-stop(0, #7ac0da), color-stop(1, #a4d4e6));
         background-image: -webkit-linear-gradient(left, #7ac0da 0%, #a4d4e6 100%);
         background-image: linear-gradient(left, #7ac0da 0%, #a4d4e6 100%);
+        color: #3e5667;
+        padding: 20px 40px 10px 40px;
+    }
+
+    body[data-site="main"] .featured .content-wrapper {
+        background-color: #7C1D00;
+        background-image: -ms-linear-gradient(left, #7C1D00 0%, #AE3E22 100%);
+        background-image: -o-linear-gradient(left, #7C1D00 0%, #AE3E22 100%);
+        background-image: -webkit-gradient(linear, left top, right top, color-stop(0, #7C1D00), color-stop(1, #AE3E22));
+        background-image: -webkit-linear-gradient(left, #7C1D00 0%, #AE3E22 100%);
+        background-image: linear-gradient(left, #7C1D00 0%, #AE3E22 100%);
         color: #3e5667;
         padding: 20px 40px 10px 40px;
     }
@@ -294,6 +313,20 @@ ul.round li.eight, ol.round li:nth-child(8) {
 }
 ul.round li.nine, ol.round li:nth-child(9) {
     background: url("../Images/orderedList9.png") no-repeat;
+}
+
+/* images */
+img.right {
+    display:  block;
+    float: right;
+    padding-left: 20px;
+    width: 22%;
+}
+img.mugshot {
+    display:  block;
+    margin-left:  auto;
+    margin-right: auto;
+    width: 200px;
 }
 
 /* content */
@@ -552,6 +585,10 @@ table {
     border: 0 none;
     display: block;
     overflow-x: auto;
+}
+#committeeTable {
+    text-align: center;
+    vertical-align: top;
 }
 
 th {

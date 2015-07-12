@@ -1,6 +1,5 @@
 ﻿@{
-    Layout     = "~/_SiteLayout.cshtml";
-    Page.Title = "Home Page";
+    Layout = "~/Library/_SiteLayout.cshtml";
 }
 
 <script type="text/javascript">
@@ -10,7 +9,7 @@
     }    
 
     var info = [
-        ["Images/tmp/library.jpg",
+        ["../Images/tmp/library.jpg",
         '<h2>Suggest Pieces for Next Semester</h2>' +
         '<p>Quickly and easily make suggestions for pieces for us to play next semester with the new <em><a href="/Suggest">Suggestions</a></em> page. ' +
         'Here you can view others\' suggestions, \'endorse\' them and search for videos of existing performances.</p>']
@@ -50,7 +49,7 @@
 
 @if (UserHelper.IsSmashing) {
 <script>
-    info.push(["/Images/nigel_escape.gif", 
+    info.push(["../Images/nigel_escape.gif", 
     '<div style="height:216px"><h2>Nigel</h2><p>nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel</p>' +
     '<p>nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel</p></div>'])
 </script>
@@ -100,7 +99,7 @@
     </li>
     <li class="note">
         <h5>How do I Take Sheet Music Home?</h5>
-        You're at the right place! Simply go to <a href="~/MyMusic"><em>My Music</em></a>, click 'Request New Loan', 
+        You're at the right place! Simply go to <a href="~/Library/MyMusic"><em>My Music</em></a>, click 'Request New Loan', 
         select the part and type of copy you would like and the music will be available for you to download now or 
         to pick up at the next rehearsal. 
         Not all pieces will allow you to take home the sheet music, however, and for some you may have to put down a deposit.
@@ -111,7 +110,7 @@
         Otherwise, if you have any questions about the music or our loans policy, if you wish to make a complaint, give music suggestions 
         or buy the hard-working librarian team a pint, feel free to get in touch!
 
-        Contact details for the librarians can be found on the <a href="/Contact">contacts</a> page. Alternatively, post a message on the 
+        Contact details for the librarians can be found on the <a href="~/Library/Contact">contacts</a> page. Alternatively, post a message on the 
         <a href="https://www.facebook.com/groups/307200819293452/">Facebook</a> group
         or come meet us in person at rehearsals.
     </li>
