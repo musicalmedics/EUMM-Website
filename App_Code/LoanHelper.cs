@@ -50,7 +50,7 @@ public static class LoanHelper
             return db.Query("SELECT * FROM [Loans - Simple] WHERE [Libraries] & @0 != 0 ORDER BY [LoanStart] DESC", Website.Library_Orchestra);
         }
         else if (user.IsChoir) {
-            return db.Query("SELECT * FROM [Loans - Simple] WHERE [Libraries] & @1 != 0 ORDER BY [LoanStart] DESC", Website.Library_Choir);
+            return db.Query("SELECT * FROM [Loans - Simple] WHERE [Libraries] & @0 != 0 ORDER BY [LoanStart] DESC", Website.Library_Choir);
         }
         // Return empty set
         return db.Query("SELECT * FROM [Loans - Simple] WHERE 1 = 0");
