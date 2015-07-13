@@ -233,7 +233,7 @@ ul#menu {
     }
 
     body[data-site="main"] .featured .content-wrapper {
-        background-color: #7C1D00;
+        background-color: #cc2117;
         background-image: -ms-linear-gradient(left, #7C1D00 0%, #AE3E22 100%);
         background-image: -o-linear-gradient(left, #7C1D00 0%, #AE3E22 100%);
         background-image: -webkit-gradient(linear, left top, right top, color-stop(0, #7C1D00), color-stop(1, #AE3E22));
