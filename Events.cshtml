@@ -1,6 +1,29 @@
 @{
     Layout = "~/_SiteLayout.cshtml";
 }
+
+@section head {
+    <link type="text/css" rel='stylesheet' href='~/Scripts/fullcalendar/fullcalendar.css' />
+    <script type='text/javascript' src='~/Scripts/fullcalendar/lib/moment.min.js'></script>
+    <script type='text/javascript' src='~/Scripts/fullcalendar/fullcalendar.min.js'></script>
+    <script type='text/javascript' src='~/Scripts/fullcalendar/gcal.js'></script>
+}
+
+<section>
+    <div id="calendar-disabled">
+        
+    </div>
+</section>
+
+<script type='text/javascript'>
+$('#calendar').fullCalendar({
+    googleCalendarApiKey: 'AIzaSyBTDREMRiyGnVVGS97tTj4fqrEcuQZJvJY',
+    events: {
+        googleCalendarId: "edinburghmusicalmedics@gmail.com"
+    }
+});
+</script>
+
 <section class="main-margin vertical-padding">
     <iframe class="center" src="https://www.google.com/calendar/embed?showTz=0&amp;height=600&amp;wkst=2&amp;bgcolor=%23ffffff&amp;src=edinburghmusicalmedics%40gmail.com&amp;color=%23875509&amp;ctz=Europe%2FLondon" style=" border-width:0 " width="800" height="600" frameborder="0" scrolling="no"></iframe>
 </section>
