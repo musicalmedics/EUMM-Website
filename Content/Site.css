@@ -37,6 +37,11 @@ a {
         background-color: #c7d1d6;
     }
 
+#committeeTable a {
+    padding: 0;
+    text-decoration: none;
+}
+
 header, footer, hgroup,
 nav, section {
     display: block;
@@ -322,7 +327,8 @@ img.right {
     padding-left: 20px;
     width: 22%;
 }
-img.mugshot {
+
+#committeeTable img, img.mugshot {
     display:  block;
     margin-left:  auto;
     margin-right: auto;
