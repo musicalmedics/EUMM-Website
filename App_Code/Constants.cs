@@ -31,6 +31,7 @@ public static partial class Website
 
     public static readonly string DBName    = "musicDB";
     public static readonly string Webmaster = "jsrenwick3@gmail.com";
+    public static readonly string GuestUUN  = "s0000000";
 
     public static readonly string UUNRegex = @"(^[se]\d{7}$)|([vV]\d{8})";
 

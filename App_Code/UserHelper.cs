@@ -12,6 +12,14 @@ using System.Web;
 /// </summary>
 public static class UserHelper
 {
+    public static bool IsGuest()
+    {
+        return IsGuest(WebSecurity.CurrentUserName);
+    }
+    public static bool IsGuest(string studentID)
+    {
+        return studentID == Website.GuestUUN;
+    }
     public static bool IsMember()
     {
         return IsMember(WebSecurity.CurrentUserName);
@@ -57,7 +65,10 @@ public static class UserHelper
         // Open the database & look for the user
         var db = Database.Open(Website.DBName);
 
-        return db.QuerySingle("SELECT * FROM Members WHERE UUN=@0", WebSecurity.CurrentUserName);
+        string user = String.IsNullOrEmpty(WebSecurity.CurrentUserName) ? 
+            Website.GuestUUN : WebSecurity.CurrentUserName;
+
+        return db.QuerySingle("SELECT * FROM Members WHERE UUN=@0", user);
     }
     public static dynamic GetUser(string studentID)
     {
@@ -68,6 +79,8 @@ public static class UserHelper
 
     public static int ConfirmUser(string studentID, NameValueCollection form)
     {
+        if (studentID == Website.GuestUUN) throw new Exception("Invalid operation on guest account.");
+
         // Open the database & update the user
         var db = Database.Open(Website.DBName);
 

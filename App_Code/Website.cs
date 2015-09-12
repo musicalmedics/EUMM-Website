@@ -8,6 +8,8 @@ using System.Dynamic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Web;
 using System.Web.SessionState;
 
@@ -165,5 +167,24 @@ public static partial class Website
             response.End();
         }
         else throw new FileNotFoundException();
+    }
+
+    public static int ClientIntegerIP
+    {
+        get
+        {
+            int ipRaw = 0;
+            IPAddress address;
+
+            // Get current IP address as int, or 0 if unavailable
+            if (IPAddress.TryParse(HttpContext.Current.Request.UserHostAddress, out address) &&
+                address.AddressFamily == AddressFamily.InterNetwork)
+            {
+#pragma warning disable CS0618 // Only used with IPv4 connections, so okay
+                ipRaw = (int)(uint)address.Address;
+#pragma warning restore CS0618
+            }
+            return ipRaw;
+        }
     }
 }

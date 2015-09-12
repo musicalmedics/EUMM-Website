@@ -12,12 +12,6 @@
     
     if (IsPost)
     {
-        if (!WebSecurity.IsAuthenticated)
-        {
-            Response.Redirect("~/Account/Login?ReturnUrl=~/Suggest");
-            return;
-        }
-
         if (Request.Form["action"] == "endorse")
         {
             Suggestions.ToggleEndorse(Request.Form["id"].AsInt());
@@ -40,10 +34,7 @@
         else { throw new Exception("Unknown action."); }
     }
     
-    if (WebSecurity.IsAuthenticated)
-    {
-        endorsed = Suggestions.GetEndorsed().Cast<int>();
-    }
+    endorsed = Suggestions.GetEndorsed().Cast<int>();
 }
 
 <style>

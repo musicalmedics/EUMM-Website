@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Web;
 using WebMatrix.Data;
 
@@ -8,22 +10,34 @@ public static class Suggestions
 {
     public static bool ToggleEndorse(int suggestionID)
     {
-        var user = UserHelper.GetUser();
-        var db   = Database.Open(Website.DBName);
+        var db    = Database.Open(Website.DBName);
+        var user  = UserHelper.GetUser();
+        int ipRaw = Website.ClientIntegerIP;
 
-        try 
-        { 
-            db.Execute("INSERT INTO [Endorsements] VALUES (@0, @1)", user.UUN, suggestionID); 
-            return true; 
+        if (UserHelper.IsGuest(user.UUN))
+        {
+            // Check if existing for this IP as we're guest
+            int existing = db.QueryValue("SELECT COUNT(*) FROM [Endorsements2] WHERE UUN=@0 AND IP=@1 AND Suggestion=@2", 
+                                            user.UUN, ipRaw, suggestionID);
+            // Add or delete to toggle
+            if (existing != 0) {
+                db.Execute("DELETE FROM [Endorsements2] WHERE UUN=@0 AND IP=@1 AND Suggestion=@2", user.UUN, ipRaw, suggestionID);
+            }
+            else db.Execute("INSERT INTO [Endorsements2] (IP, Suggestion) VALUES (@0, @1)", ipRaw, suggestionID);
         }
-        catch 
-        { 
-            try 
-            { 
-                db.Execute("DELETE FROM [Endorsements] WHERE UUN=@0 AND Suggestion=@1", user.UUN, suggestionID); 
-                return true; 
-            } catch { return false; } 
+        else
+        {
+            // Check if existing for this user
+            int existing = db.QueryValue("SELECT COUNT(*) FROM [Endorsements2] WHERE UUN=@0 AND Suggestion=@1",
+                                            user.UUN, suggestionID);
+            // Add or delete to toggle
+            if (existing != 0) {
+                db.Execute("DELETE FROM [Endorsements2] WHERE UUN=@0 AND Suggestion=@1", user.UUN, suggestionID);
+            }
+            else db.Execute("INSERT INTO [Endorsements2] (UUN, Suggestion) VALUES (@0, @1)", user.UUN);
         }
+        return true; 
+        
     }
 
     public static int Create(string title, bool isOrchestra, bool isChoir)
@@ -45,7 +59,7 @@ public static class Suggestions
 
         // Order by votes
         var res = db.Query(@"SELECT Suggestions.Suggestion, Title, IsChoir, IsOrchestra FROM Suggestions 
-                             JOIN Endorsements ON Suggestions.Suggestion=Endorsements.Suggestion
+                             JOIN Endorsements2 ON Suggestions.Suggestion=Endorsements2.Suggestion
                              GROUP BY Suggestions.Suggestion, Title, IsChoir, IsOrchestra
                              ORDER BY count(Suggestions.Suggestion) DESC");
         return res;
@@ -57,11 +71,23 @@ public static class Suggestions
     }
     public static IEnumerable<int> GetEndorsed(string userID)
     {
-        var db = Database.Open(Website.DBName);
+        var db    = Database.Open(Website.DBName);
+        int ipRaw = Website.ClientIntegerIP;
 
-        var res = db.Query(@"SELECT DISTINCT Suggestions.Suggestion FROM Suggestions 
-                             JOIN Endorsements ON Suggestions.Suggestion=Endorsements.Suggestion
+        IEnumerable<dynamic> res;
+
+        if (UserHelper.IsGuest(userID))
+        {
+            res = db.Query(@"SELECT DISTINCT Suggestions.Suggestion FROM Suggestions 
+                             JOIN Endorsements2 ON Suggestions.Suggestion=Endorsements2.Suggestion
+                             WHERE UUN=@0 AND Endorsements2.IP=@1", userID, ipRaw);
+        }
+        else
+        {
+            res = db.Query(@"SELECT DISTINCT Suggestions.Suggestion FROM Suggestions 
+                             JOIN Endorsements2 ON Suggestions.Suggestion=Endorsements2.Suggestion
                              WHERE UUN=@0", userID);
+        }
         
         // Convert to int array
         int[] output = new int[res.Count()];
