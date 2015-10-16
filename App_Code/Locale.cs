@@ -19,6 +19,7 @@ public static class Locale
                 {"ErrorNoPass",  "You must specify a password."},
                 {"ErrorPassLen", "Password must be at least 6 characters."},
                 {"ErrorLogin",   "The student number or password provided is incorrect."},
+                {"ErrorMember",  "We don't seem to have you down as a member. Please contact a librarian if you feel this is in error."},
                 {"ErrorValid",   "Log in was unsuccessful. Please correct the errors and try again."},
                 {"PromptLogin",  "Members, use your student no. to log in."},
                 {"Original",     "Original"},

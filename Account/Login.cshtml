@@ -100,7 +100,10 @@
                     Context.RedirectLocal(Href("~/Account/Confirm?sid="+studentid));
                     return;
                 }
-            }            
+            }
+            else if (isFirstLogIn && firstTime) {
+                ModelState.AddFormError(Locale.Messages["ErrorMember"]);
+            }
             else { ModelState.AddFormError(Locale.Messages["ErrorLogin"]); }
         }
     }
