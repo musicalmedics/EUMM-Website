@@ -15,7 +15,7 @@
 @{
     Layout     = "~/Library/_SiteLayout.cshtml";
     Page.Title = "Log in";
-    
+
     // If already logged-in, just go to MyMusic
     if (WebSecurity.IsAuthenticated)
     {
@@ -28,32 +28,32 @@
     var password   = "";
     var rememberMe = true;
     var firstTime  = Request.QueryString["init"].AsBool(false);
-    
+
     var returnUrl = Request.QueryString["ReturnUrl"];
     if (returnUrl.IsEmpty()) { returnUrl = Href("~/Library/MyMusic"); }
-    
+
     // Set up validation
     Validation.RequireField("studentid", Locale.Messages["ErrorUUN"]);
-    
-    Validation.Add("studentid", Validator.Regex(Website.UUNRegex, 
+
+    Validation.Add("studentid", Validator.Regex(Website.UUNRegex,
                 Locale.Messages["ErrorUUN"]));
 
     // If this is a POST request, validate and process data
     if (IsPost)
     {
         AntiForgery.Validate();
-        
+
         studentid  = Request.Form["studentid"];
         password   = Request.Form["password"];
         rememberMe = "on".Equals(Request.Form["rememberMe"]);
-        firstTime  = Request.Form["firstTime"].AsBool();
+        firstTime  = "on".Equals(Request.Form["firstTime"]);
 
         // Manage external logins by removing the leading 'v'
         if (studentid.StartsWith("v") || studentid.StartsWith("V")) {
             studentid = studentid.Remove(0, 1);
         }
-        
-        
+
+
         if (!firstTime)
         {
             Validation.RequireField("password", Locale.Messages["ErrorNoPass"]);
@@ -63,14 +63,14 @@
                     minLength: 6,
                     errorMessage: Locale.Messages["ErrorPassLen"]));
         }
-      
+
         bool isFirstLogIn = !WebSecurity.UserExists(studentid);
-        
-        if (Validation.IsValid("studentid") && 
+
+        if (Validation.IsValid("studentid") &&
             (firstTime || Validation.IsValid("password")))
-        {            
+        {
             // Check if account has been locked out
-            if (!isFirstLogIn && WebSecurity.GetPasswordFailuresSinceLastSuccess(studentid) > 4 
+            if (!isFirstLogIn && WebSecurity.GetPasswordFailuresSinceLastSuccess(studentid) > 4
             && WebSecurity.GetLastPasswordFailureDate(studentid).AddSeconds(60) > DateTime.UtcNow)
             {
                 Response.Redirect("~/Account/AccountLockedOut");
