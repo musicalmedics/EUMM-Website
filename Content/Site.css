@@ -319,6 +319,21 @@ ul.round li.eight, ol.round li:nth-child(8) {
 ul.round li.nine, ol.round li:nth-child(9) {
     background: url("../Images/orderedList9.png") no-repeat;
 }
+ul.round li.nine, ol.round li:nth-child(10) {
+    background: url("../Images/orderedList10.png") no-repeat;
+}
+ul.round li.nine, ol.round li:nth-child(11) {
+    background: url("../Images/orderedList11.png") no-repeat;
+}
+ul.round li.nine, ol.round li:nth-child(12) {
+    background: url("../Images/orderedList12.png") no-repeat;
+}
+ul.round li.nine, ol.round li:nth-child(13) {
+    background: url("../Images/orderedList13.png") no-repeat;
+}
+ul.round li.nine, ol.round li:nth-child(14) {
+    background: url("../Images/orderedList14.png") no-repeat;
+}
 
 /* images */
 img.right {

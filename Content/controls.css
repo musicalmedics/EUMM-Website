@@ -88,6 +88,21 @@
 .multipanel .panel[data-number="9"] {
     background-image: url(/Images/orderedList9.png);
 }
+.multipanel .panel[data-number="10"] {
+    background-image: url(/Images/orderedList10.png);
+}
+.multipanel .panel[data-number="11"] {
+    background-image: url(/Images/orderedList11.png);
+}
+.multipanel .panel[data-number="12"] {
+    background-image: url(/Images/orderedList12.png);
+}
+.multipanel .panel[data-number="13"] {
+    background-image: url(/Images/orderedList13.png);
+}
+.multipanel .panel[data-number="14"] {
+    background-image: url(/Images/orderedList14.png);
+}
 
 .multipanel .panel .title {
     margin-left  : 40px;
