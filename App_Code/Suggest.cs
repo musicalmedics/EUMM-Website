@@ -34,7 +34,7 @@ public static class Suggestions
             if (existing != 0) {
                 db.Execute("DELETE FROM [Endorsements2] WHERE UUN=@0 AND Suggestion=@1", user.UUN, suggestionID);
             }
-            else db.Execute("INSERT INTO [Endorsements2] (UUN, Suggestion) VALUES (@0, @1)", user.UUN);
+            else db.Execute("INSERT INTO [Endorsements2] (UUN, Suggestion) VALUES (@0, @1)", user.UUN, suggestionID);
         }
         return true; 
         
