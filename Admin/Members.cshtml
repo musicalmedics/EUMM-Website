@@ -38,10 +38,10 @@
                 Request.Form["email"],
                 true, 
                 "on".Equals(Request.Form["orchestra"]),
-                "on".Equals(Request.Form["choir"].AsBool()), 
-                "on".Equals(Request.Form["admin"].AsBool())
+                "on".Equals(Request.Form["choir"]), 
+                "on".Equals(Request.Form["admin"])
             );
-            Response.RedirectPermanent("");
+            Response.RedirectPermanent("~/Admin/Members");
         }
     }
 }
