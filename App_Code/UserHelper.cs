@@ -37,10 +37,10 @@ public static class UserHelper
         else throw new Exception("More than one member matches the given UUN");
     }
 
-    public static dynamic GetMembers(bool showInactive=false)
+    public static dynamic GetMembers(bool showInactive = false)
     {
         var db = Database.Open(Website.DBName);
-        return db.Query("SELECT * from Members" + (!showInactive ? " WHERE IsMember='1'":""));
+        return db.Query("SELECT * from Members WHERE UUN!='s0000000'" + (!showInactive ? " AND IsMember='1'":" "));
     }
 
     public static bool IsAdmin()
@@ -190,6 +190,13 @@ public static class UserHelper
             
             uun, fname, lname, email, (member?"1":"0"),(orchestra?"1":"0"),(choir?"1":"0"),(admin?"1":"0")
         );
+    }
+
+    public static int SetMemberFlags(string uun, bool isActive, bool isOrchestra, bool isChoir, bool isAdmin)
+    {
+        var db = Database.Open(Website.DBName);
+        return db.Execute("UPDATE Members SET IsMember=@0, IsOrchestra=@1, IsChoir=@2, IsAdmin=@3 WHERE UUN=@4", 
+            (isActive ? "1" : "0"), (isOrchestra ? "1" : "0"), (isChoir ? "1" : "0"), (isAdmin ? "1" : "0"), uun);
     }
 
     ///<summary>Easter Egg!</summary>

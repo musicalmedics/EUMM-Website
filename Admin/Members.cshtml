@@ -1,4 +1,6 @@
 ﻿@using WebMatrix.WebData
+@using WebMatrix.Data
+@using System.Linq;
 @section Scripts {
     <script src="~/Scripts/jquery.validate.min.js"></script>
     <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
@@ -23,29 +25,44 @@
     bool errFName = !ModelState.IsValidField("fname");
     bool errLName = !ModelState.IsValidField("lname");
 
-    var db      = Database.Open(Website.DBName);
-    var action  = Request.Form["action"];
-    var members = UserHelper.GetMembers(Request.QueryString.Get("showall") == null);
-
     if (IsPost)
     {
-        if (Validation.IsValid())
+        if (Request.Form["function"] == "add-member")
         {
-            UserHelper.AddMember(
-                Request.Form["uun"], 
-                Request.Form["fname"], 
-                Request.Form["lname"],
-                Request.Form["email"],
-                true, 
-                "on".Equals(Request.Form["orchestra"]),
-                "on".Equals(Request.Form["choir"]), 
-                "on".Equals(Request.Form["admin"])
-            );
-            Response.RedirectPermanent("~/Admin/Members");
+            if (Validation.IsValid())
+            {
+                UserHelper.AddMember(
+                    Request.Form["uun"],
+                    Request.Form["fname"],
+                    Request.Form["lname"],
+                    Request.Form["email"],
+                    true,
+                    "on".Equals(Request.Form["orchestra"]),
+                    "on".Equals(Request.Form["choir"]),
+                    "on".Equals(Request.Form["admin"])
+                );
+                Response.RedirectPermanent("~/Admin/Members");
+            }
+        }
+        else if (Request.Form["function"] == "set-member")
+        {
+            var memberFlags = Request.Form.Cast<string>().Where(k => k != "function")
+                .ToLookup(k => k.Split('-')[0], k => k.Split('-')[1]);
+
+            foreach (string uun in memberFlags.Select(g => g.Key))
+            {
+                UserHelper.SetMemberFlags(uun, 
+                    memberFlags[uun].Contains("member"),
+                    memberFlags[uun].Contains("orchestra"),
+                    memberFlags[uun].Contains("choir"),
+                    memberFlags[uun].Contains("admin"));
+            }
         }
     }
-}
 
+    var db      = Database.Open(Website.DBName);
+    var members = UserHelper.GetMembers(Request.QueryString.Get("showall") == null);
+}
 <script type="text/javascript">
 
 </script>
@@ -62,6 +79,7 @@
 <p>Hover over an input to see a further description.</p>
 
 <form method="post" id="form2">
+<input type="hidden" name="function" value="add-member" />
 <table>
     <tr title="The member's university username. Must be either 's#######' or '########' format.">
         <td><b @if (errUUN){ <text> class="error-label" </text> }>University Username</b></td>
@@ -102,6 +120,7 @@
 <h2>Current Members</h2>
 <br/>
 <form method="post" id="form">
+<input type="hidden" name="function" value="set-member" />
 <table>
     <tr>
         <td><b>UUN</b></td>
@@ -119,31 +138,15 @@
         <tr>
             <td>@row.UUN</td>
             <td>@name</td>
-            @if(row.IsMember) { 
-                <td><input type="checkbox" checked="Checked" name="member"/></td>
-            } else {
-                <td><input type="checkbox" name="member"/></td>
-            }
-            @if(row.IsOrchestra) { 
-                <td><input type="checkbox" checked="Checked" name="orchestra"/></td>
-            } else {
-                <td><input type="checkbox" name="orchestra"/></td>
-            }
-            @if(row.IsChoir) { 
-                <td><input type="checkbox" checked="Checked" name="choir"/></td>
-            } else {
-                <td><input type="checkbox" name="choir"/></td>
-            }
-            @if(row.IsAdmin) { 
-                <td><input type="checkbox" checked="Checked" name="admin"/></td>
-            } else {
-                <td><input type="checkbox" name="admin"/></td>
-            }
+            <td><input type="checkbox" name="@row.UUN-member"    @(row.IsMember    ? "checked" : "")/></td>
+            <td><input type="checkbox" name="@row.UUN-orchestra" @(row.IsOrchestra ? "checked" : "")/></td>
+            <td><input type="checkbox" name="@row.UUN-choir"     @(row.IsChoir     ? "checked" : "")/></td>
+            <td><input type="checkbox" name="@row.UUN-admin"     @(row.IsAdmin     ? "checked" : "")/></td>
             <td>@row.Email</td>
         </tr>
     }
 </table>
 <br/>
-<!--input type="button" value="Update Records" onclick="commitChanges()" /-->
+<input type="submit" value="Update Records" />
 </form>
 </section>
