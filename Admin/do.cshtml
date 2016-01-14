@@ -1,8 +1,8 @@
 ﻿@using WebMatrix.WebData;
 @{
     // Redirect to error if not authenticated
-    if (!WebSecurity.IsAuthenticated || !UserHelper.IsAdmin()) { 
-        Response.RedirectPermanent("~/Library/ThankYou"); return; 
+    if (!WebSecurity.IsAuthenticated || !UserHelper.IsAdmin()) {
+        Response.RedirectPermanent("~/Library/ThankYou"); return;
     }
 
     var action = Request.QueryString["action"];
@@ -13,10 +13,15 @@
         var reqID = Request.QueryString["req"];
         if (reqID != null) { LoanHelper.CancelRequest(reqID.AsInt()); }
     }
+    else if (action == "disablepiece")
+    {
+        var piece = Request.QueryString["id"];
+        if (piece != null) { LoanHelper.SetPieceFlags(piece, false, false); }
+    }
 
     if (redir == "TODO") { Response.RedirectPermanent("~/Admin/Loans"); }
+    else if (redir == "pieces") { Response.RedirectPermanent("~/Admin/Library"); }
 
-    
 }
 
 <!DOCTYPE html>
