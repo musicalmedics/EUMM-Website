@@ -334,6 +334,9 @@ ul.round li.nine, ol.round li:nth-child(13) {
 ul.round li.nine, ol.round li:nth-child(14) {
     background: url("../Images/orderedList14.png") no-repeat;
 }
+ul.round li.nine, ol.round li {
+    background: url("../Images/orderedListDefault.png") no-repeat;
+}
 
 /* images */
 img.right {

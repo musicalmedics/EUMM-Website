@@ -60,6 +60,7 @@ public static class Suggestions
         // Order by votes
         var res = db.Query(@"SELECT Suggestions.Suggestion, Title, IsChoir, IsOrchestra FROM Suggestions 
                              JOIN Endorsements2 ON Suggestions.Suggestion=Endorsements2.Suggestion
+                             WHERE Suggestions.Active='1'
                              GROUP BY Suggestions.Suggestion, Title, IsChoir, IsOrchestra
                              ORDER BY count(Suggestions.Suggestion) DESC");
         return res;
