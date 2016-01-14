@@ -1,0 +1,125 @@
+﻿@using WebMatrix.WebData;
+@section Scripts {
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+}
+@{
+    Layout     = "~/Library/_SiteLayout.cshtml";
+    Page.Title = "Manage Library";
+
+    if (!UserHelper.IsAdmin()) {
+        Response.RedirectPermanent("~/Library/");
+    }
+
+    if (IsPost)
+    {
+        AntiForgery.Validate();
+
+        if (Validation.IsValid())
+        {
+            if (Request.Files.Count != 0)
+            {
+                var file = Request.Files.Get(0);
+
+                if (file.ContentLength != 0) {
+                    //Website.UploadHiddenFile(file.FileName, file.InputStream);
+                }
+            }
+        }
+    }
+}
+
+<div>
+    <hgroup class="title">
+        <h1>Administration.</h1>
+        <h2>View and manage the online library.</h2>
+    </hgroup>
+    <section>
+        <h2>Add New Part</h2>
+        <p>Entries in bold are required. The rest are optional and can be left blank.</p>
+        <p>Hover over an input to see a further description.</p>
+        <form method="post" enctype="multipart/form-data">
+            @AntiForgery.GetHtml()
+
+            <h3>Parts</h3>
+            <table style="white-space: nowrap">
+                <thead style="font-weight: bold"><tr>
+                    <td>Instrument</td>
+                    <td>Designation</td>
+                </tr></thead>
+                <tr>
+                    <td>
+                        <select name="instrument" >
+                            <optgroup label="Choir">
+                                <option>SATB</option>
+                            </optgroup>
+                            <optgroup label="Strings">
+                                <option>Violin</option>
+                                <option>Viola</option>
+                                <option>Cello</option>
+                                <option>Double Bass</option>
+                            </optgroup>
+                            <optgroup label="Woodwind">
+                                <option>Piccolo</option>
+                                <option>Flute</option>
+                                <option>Oboe</option>
+                                <option>Clarinet</option>
+                                <option>Bass Clarinet</option>
+                                <option>Bassoon</option>
+                                <option>Cor Anglais</option>
+                            </optgroup>
+                            <optgroup label="Brass">
+                                <option>Trumpet</option>
+                                <option>French Horn</option>
+                                <option>Trombone</option>
+                                <option>Bass Trombone</option>
+                                <option>Tuba</option>
+                            </optgroup>
+                            <optgroup label="Other">
+                                <option>Piano</option>
+                                <option>Percussion</option>
+                                <option>Full Score</option>
+                            </optgroup>
+                        </select>
+                    <td><input type="text" name="designation" placeholder="Violin I"/></td>
+                </tr>
+            </table>
+            <br />
+            <style>
+                .small-number {
+                    display: inline;
+                    width: 35px;
+                }
+                tbody {
+                    vertical-align: top
+                }
+            </style>
+            <table style="white-space: nowrap; vertical-align: top">
+                <thead style="font-weight: bold"><tr>
+                    <td>Availability</td>
+                    <td>Deposit</td>
+                    <td>Digital Copy File</td>
+                </tr></thead>
+                <tr>
+                    <td>
+                        <text>Limited Copies &nbsp;</text><input type="checkbox" name="limited" />&nbsp;
+                        <text>No. &nbsp;</text><input type="number" value="1" class="small-number" name="count" /><br />
+
+                        <table>
+                            <tr><td>Original</td><td>Paper</td><td>Digital</td></tr>
+                            <tr><td><input type="checkbox" name="original" /></td><td><input type="checkbox" name="original" /></td><td><input type="checkbox" name="original" /></td></tr>
+                        </table>
+                    </td>
+                    <td>
+                        £&nbsp;<input type="number" class="small-number" name="deposit" value="0"/>
+                    </td>
+                    <td>
+                        <input type="file" name="file" />
+                    </td>
+                </tr>
+            </table>
+            @Html.ValidationSummary("Please re-enter any incorrect inputs before continuing.", excludeFieldErrors: false, htmlAttributes: null)
+            <button type="submit">Test</button>
+        </form>
+    </section>
+</div>

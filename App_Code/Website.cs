@@ -169,6 +169,16 @@ public static partial class Website
         else throw new FileNotFoundException();
     }
 
+    public static void UploadHiddenFile(string filename, Stream data)
+    {
+        var file = File.Create(Path.Combine(
+            HttpContext.Current.Server.MapPath("~/Hidden/"), filename));
+
+        file.Seek(0, SeekOrigin.Begin);
+        data.CopyTo(file);
+        file.Close();
+    }
+
     public static int ClientIntegerIP
     {
         get
