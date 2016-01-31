@@ -11,35 +11,81 @@
         Response.RedirectPermanent("~/Library/");
     }
 
+    Validation.RequireField("designation", "You must specify the part designation.");
+    bool errDesig = !ModelState.IsValidField("designation");
+
+    // Gets the piece ID
+    int pieceID = 1;
+    int.TryParse(Request.QueryString["pieceID"], out pieceID);
+
+    if (pieceID < 0) {
+        Response.RedirectPermanent("~/Library/ThankYou?err=InvalidPieceID");
+    }
+
+    string pieceTitle = Request.QueryString["pieceTitle"] ?? "#Error: Unable to get title";
+
     if (IsPost)
     {
-        AntiForgery.Validate();
-
-        if (Validation.IsValid())
+        if (Request.Form["function"] == "add-part" && Validation.IsValid())
         {
+            AntiForgery.Validate();
+
+            string filename = null;
             if (Request.Files.Count != 0)
             {
                 var file = Request.Files.Get(0);
 
-                if (file.ContentLength != 0) {
-                    //Website.UploadHiddenFile(file.FileName, file.InputStream);
+                if (file.ContentLength != 0)
+                {
+                    Website.UploadHiddenFile(file.FileName, file.InputStream);
                 }
+                filename = file.FileName;
+            }
+
+            LoanHelper.AddPart(pieceID,
+                Request.Form["instrument"],
+                Request.Form["designation"],
+                Request.Form["limited"] == "on" ? (int?)int.Parse(Request.Form["count"]) : null,
+                Request.Form["original"] == "on", Request.Form["paper"] == "on", Request.Form["digital"] == "on",
+                filename,
+                float.Parse(Request.Form["deposit"])
+            );
+        }
+        else if (Request.Form["function"] == "set-parts")
+        {
+            var partFlags = Request.Form.Cast<string>().Where(k => k != "function")
+                .ToLookup(k => k.Split('-')[0], k => k.Split('-')[1]);
+
+            foreach (string id in partFlags.Select(g => g.Key))
+            {
+                LoanHelper.EditPart(id,
+                    partFlags[id].Contains("loanorig"),
+                    partFlags[id].Contains("loancopy"),
+                    partFlags[id].Contains("loanpdf"),
+                    Request.Form[id.ToString()+"-deposit"].AsFloat()
+                );
             }
         }
     }
+
+    var parts = LoanHelper.GetParts(pieceID.ToString());
 }
 
 <div>
     <hgroup class="title">
         <h1>Administration.</h1>
-        <h2>View and manage the online library.</h2>
+        <h2>Parts for '@pieceTitle'</h2>
     </hgroup>
+    
+    <br />
+
     <section>
         <h2>Add New Part</h2>
         <p>Entries in bold are required. The rest are optional and can be left blank.</p>
         <p>Hover over an input to see a further description.</p>
         <form method="post" enctype="multipart/form-data">
             @AntiForgery.GetHtml()
+            <input type="hidden" name="function" value="add-part" />
 
             <h3>Parts</h3>
             <table style="white-space: nowrap">
@@ -107,7 +153,7 @@
 
                         <table>
                             <tr><td>Original</td><td>Paper</td><td>Digital</td></tr>
-                            <tr><td><input type="checkbox" name="original" /></td><td><input type="checkbox" name="original" /></td><td><input type="checkbox" name="original" /></td></tr>
+                            <tr><td><input type="checkbox" name="original" /></td><td><input type="checkbox" name="paper" /></td><td><input type="checkbox" name="digital" /></td></tr>
                         </table>
                     </td>
                     <td>
@@ -119,7 +165,61 @@
                 </tr>
             </table>
             @Html.ValidationSummary("Please re-enter any incorrect inputs before continuing.", excludeFieldErrors: false, htmlAttributes: null)
-            <button type="submit">Test</button>
+            <br/>
+            <button type="submit">Add Part</button>
         </form>
     </section>
+
+    <br />
+    <br />
+
+    <section>
+        <h2>Existing Parts</h2>
+        <br />
+        <form method="post" id="form">
+            <input type="hidden" name="function" value="set-parts" />
+            <style>
+                .table-band {
+                    background-color: #DDD;
+                }
+            </style>
+            <table>
+                <tr>
+                    <td><b>Instrument</b></td>
+                    <td><b>Designation</b></td>
+                    <td><b>Number Available</b></td>
+                    <td><b>Deposit</b></td>
+                    <td><b>Can Lend Original</b></td>
+                    <td><b>Can Lend Photocopy</b></td>
+                    <td><b>Can Lend Digital</b></td>
+                    <!--<td><b>PDF File</b></td>-->
+                    <td></td>
+                </tr>
+
+                @{ bool color = true; }
+                @foreach (var row in parts)
+                {
+                    color = !color;
+                    <tr class="@(color?"table-band":"")">
+                        <td>@row.Instrument</td>
+                        <td>@row.Designation</td>
+                        <td>@(row.Count == null ? "-" : row.Count.ToString())</td>
+                        <td><input type="number" name="@row.ID-deposit" value="@row.Deposit" /></td>
+                        <td><input type="checkbox" name="@row.ID-loanorig" @(row.CanLendOriginal ? "checked" : "") /></td>
+                        <td><input type="checkbox" name="@row.ID-loancopy" @(row.CanLendCopy ? "checked" : "") /></td>
+                        <td><input type="checkbox" name="@row.ID-loanpdf" @(row.CanLendDigital ? "checked" : "") /></td>
+                        <!--<td><input type="file" name="row.ID-file"/></td>-->
+                        <td>
+                            <a href="~/Admin/do?redir=pieces&action=disablepart&id=@row.ID"
+                               onclick="return confirm('Are you sure you wish to remove this part?')">Remove</a>
+                            <input type="hidden" name="@row.ID-id" />
+                        </td>
+                    </tr>
+                }
+            </table>
+            <br />
+            <input type="submit" value="Update Parts" />
+        </form>
+    </section>
+
 </div>

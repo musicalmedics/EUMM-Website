@@ -171,6 +171,10 @@ public static partial class Website
 
     public static void UploadHiddenFile(string filename, Stream data)
     {
+        // Ensure 'Hidden' directory exists
+        Directory.CreateDirectory(HttpContext.Current.Server.MapPath("~/Hidden/"));
+
+        // Create or overwrite file
         var file = File.Create(Path.Combine(
             HttpContext.Current.Server.MapPath("~/Hidden/"), filename));
 

@@ -11,7 +11,7 @@ public static class LoanHelper
 {
     public static IEnumerable<dynamic> GetInstrumentList()
     {
-        return Database.Open(Website.DBName).Query("SELECT DISTINCT Instrument FROM Parts");
+        return Database.Open(Website.DBName).Query("SELECT DISTINCT Instrument FROM Parts WHERE Parts.IsPresent='1'");
     }
 
     public static IEnumerable<dynamic> GetPieces()
@@ -77,7 +77,7 @@ public static class LoanHelper
         int.Parse(pieceID); // Validate input
 
         var db = Database.Open(Website.DBName);
-        var q  = db.Query("SELECT * FROM Parts WHERE Piece=@0 ORDER BY "+orderBy, pieceID);
+        var q  = db.Query("SELECT * FROM Parts WHERE Piece=@0 AND IsPresent='1' ORDER BY "+orderBy, pieceID);
 
         dynamic Parts = Website.ExpandoFromTable(q);
 
@@ -180,8 +180,9 @@ public static class LoanHelper
         if (String.IsNullOrWhiteSpace(edition))  edition  = null;
         if (String.IsNullOrWhiteSpace(notes))    notes    = null;
 
-        return Database.Open(Website.DBName).Execute("INSERT INTO Pieces "+
-            "(Title,Author,ArrangedBy,Opus,Edition,Libraries,IsPresent,IsOwned,LoanEnd,NextPerformance,NotesUponLoan)"+
+        return (int)Database.Open(Website.DBName).QueryValue("INSERT INTO Pieces "+
+            "(Title,Author,ArrangedBy,Opus,Edition,Libraries,IsPresent,IsOwned,LoanEnd,NextPerformance,NotesUponLoan) "+
+            "OUTPUT INSERTED.ID "+
             "VALUES (@0,@1,@2,@3,@4,@5,1,@6,@7,@8,@9)",
                 
             title, author, arranger, opus, edition, library.ToString(), (owned?"1":"0"), dloan, dperf, notes);
@@ -193,9 +194,27 @@ public static class LoanHelper
             (loanable ? "1" : "0"), (present ? "1" : "0"), id);
     }
 
+    public static int EditPart(string id, bool canLendOrig, bool canLendCopy, bool canLendDigital, 
+        float deposit)
+    {
+        return Database.Open(Website.DBName).Execute("UPDATE Parts SET CanLendOriginal=@0, "+
+            "CanLendCopy=@1, CanLendDigital=@2, Deposit=@3 WHERE ID=@4",
+
+            (canLendOrig ? "1" : "0"), (canLendCopy ? "1" : "0"), (canLendDigital ? "1" : "0"), deposit, id);
+    }
+
     public static int AddPart(int pieceID, string instrument, string designation, int? count, bool original,
         bool paper, bool digital, string filepath, float deposit)
     {
-        throw new NotImplementedException();
+        if (String.IsNullOrWhiteSpace(instrument)) instrument = null;
+        if (String.IsNullOrWhiteSpace(designation)) designation = null;
+
+
+        return Database.Open(Website.DBName).Execute("INSERT INTO Parts " +
+            "(Piece,Instrument,Designation,Count,CanLendOriginal,CanLendCopy,CanLendDigital,DigitalCopyPath,Deposit) " +
+            "VALUES (@0,@1,@2,@3,@4,@5,@6,@7,@8)",
+
+            pieceID, instrument, designation, count, original ? "1" : "0", paper ? "1" : "0", digital ? "1" : "0",
+            filepath, deposit);
     }
 }

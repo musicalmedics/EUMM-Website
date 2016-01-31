@@ -33,7 +33,7 @@
             DateTime? dPerf = (String.IsNullOrWhiteSpace(Request.Form["nextperform"]) ? null :
                 (DateTime?)Request.Form["nextperform"].AsDateTime());
 
-            LoanHelper.AddPiece(
+            int id = LoanHelper.AddPiece(
                 Request.Form["title"],
                 Request.Form["author"],
                 Request.Form["library"].AsInt(),
@@ -44,6 +44,10 @@
                 dLoan, dPerf,
                 Request.Form["notes"]
             );
+
+            // Redirect to parts page for new piece
+            Response.Redirect(String.Format("~/Admin/Parts?pieceID={0}&pieceTitle={1}", 
+                id.ToString(), Uri.EscapeDataString(Request.Form["title"])));
         }
         else if (Request.Form["function"] == "set-piece")
         {
@@ -145,6 +149,7 @@
                     <td><b>Performance</b></td>
                     <td><b>Loanable</b></td>
                     <td></td>
+                    <td></td>
                 </tr>
 
                 @{ bool color = true; }
@@ -162,7 +167,11 @@
                         <td>@(row.NextPerformance != null ? row.NextPerformance.ToString("dd/MM/yyyy") : "<unknown>")</td>
                         <td><input type="checkbox" name="@row.ID-loanable" @(row.CanLendParts ? "checked" : "") /></td>
                         <td>
-                            <a href="~/Admin/do?redir=pieces&action=disablepiece&id=@row.ID">Remove</a>
+                            <a href="~/Admin/Parts?pieceID=@row.ID&pieceTitle=@Uri.EscapeDataString(row.Title)">Parts</a>
+                        </td>
+                        <td>
+                            <a href="~/Admin/do?redir=pieces&action=disablepiece&id=@row.ID"
+                               onclick="return confirm('Are you sure you wish to remove this piece?')">Remove</a>
                             <input type="hidden" name="@row.ID-id" />
                         </td>
                     </tr>
