@@ -7,6 +7,9 @@
     Layout     = "~/Library/_SiteLayout.cshtml";
     Page.Title = "Manage Library";
 
+    string limitTitle = "If checked, indicates that there are a limited number of copies available. " +
+        "This is often the case with purchased or rented parts.";
+
     if (!UserHelper.IsAdmin()) {
         Response.RedirectPermanent("~/Library/");
     }
@@ -81,7 +84,7 @@
 
     <section>
         <h2>Add New Part</h2>
-        <p>Entries in bold are required. The rest are optional and can be left blank.</p>
+        <p>All fields but 'Digital Copy File' are required.</p>
         <p>Hover over an input to see a further description.</p>
         <form method="post" enctype="multipart/form-data">
             @AntiForgery.GetHtml()
@@ -94,7 +97,7 @@
                     <td>Designation</td>
                 </tr></thead>
                 <tr>
-                    <td>
+                    <td title="The type of instrument for which the part was written.">
                         <select name="instrument" >
                             <optgroup label="Choir">
                                 <option>SATB</option>
@@ -127,7 +130,8 @@
                                 <option>Full Score</option>
                             </optgroup>
                         </select>
-                    <td><input type="text" name="designation" placeholder="Violin I"/></td>
+                    <td title="The exact instrument name (including number) as written on the part."><input type="text" name="designation" placeholder="Violin I" 
+                            @Validation.For("designation")/></td>
                 </tr>
             </table>
             <br />
@@ -148,18 +152,27 @@
                 </tr></thead>
                 <tr>
                     <td>
-                        <text>Limited Copies &nbsp;</text><input type="checkbox" name="limited" />&nbsp;
-                        <text>No. &nbsp;</text><input type="number" value="1" class="small-number" name="count" /><br />
+                        <text title="@limitTitle">Limited Copies &nbsp;</text><input title="@limitTitle" type="checkbox" name="limited" />&nbsp;
 
+                        <text>No. &nbsp;</text><input title="The number of available parts, where limited." 
+                                                      type="number" value="1" class="small-number" name="count" /><br />
                         <table>
-                            <tr><td>Original</td><td>Paper</td><td>Digital</td></tr>
-                            <tr><td><input type="checkbox" name="original" /></td><td><input type="checkbox" name="paper" /></td><td><input type="checkbox" name="digital" /></td></tr>
+                            <tr>
+                                <td title="If checked, allows loaning original copies of parts.">Original</td>
+                                <td title="If checked, allows requesting photocopies of parts.">Paper</td>
+                                <td title="If checked, allows loaning digital copies of parts.">Digital</td>
+                            </tr>
+                            <tr>
+                                <td title="If checked, allows loaning original copies of parts."><input type="checkbox" name="original" /></td>
+                                <td title="If checked, allows requesting photocopies of parts."><input type="checkbox" name="paper" /></td>
+                                <td title="If checked, allows loaning digital copies of parts."><input type="checkbox" name="digital" /></td>
+                            </tr>
                         </table>
                     </td>
-                    <td>
+                    <td title="Amount, in pounds, of deposit required for borrowing an original copy.">
                         £&nbsp;<input type="number" class="small-number" name="deposit" value="0"/>
                     </td>
-                    <td>
+                    <td title="File to download when borrowing a digital copy.">
                         <input type="file" name="file" />
                     </td>
                 </tr>
