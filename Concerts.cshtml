@@ -1,15 +1,137 @@
 ﻿@{
-    
+    Layout = "~/_SiteLayout.cshtml";
 }
 
-<!DOCTYPE html>
+<script type="text/javascript">
 
-<html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <title></title>
-    </head>
-    <body>
-        
-    </body>
-</html>
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min)) + min;
+    }    
+
+    var info = [
+		["../Images/grieg.jpg",
+		'<h2>Edvard Grieg & Peer Gynt</h2>' +
+		'<b>Winter Concert 2015</b>'+
+        '<p>Peer Gynt, Op. 23 is the incidental music to Henrik Ibsen\'s 1867 play of the same name, written by the Norwegian composer Edvard Grieg in 1875. Later, in 1888 and 1891, Grieg extracted eight movements to make two four-movement suites: Suite No. 1, Op. 46, and Suite No. 2, Op. 55.</p>' +
+		
+		'<b>Morning Mood (Morgenstemning)</b>'+
+		'<p>The piece depicts the rising of the sun during act 4, scene 4, of Ibsen\'s play, which finds the eponymous hero stranded in the Moroccan desert after his companions took his yacht and abandoned him there while he slept. The scene begins with the following description: <em>A grove of palms and acacias at dawn. Peer Gynt is up a tree, protecting himself with a broken-off branch from a swarm of apes.</em></p>' +
+		
+		'<b>In the Hall of the Mountain King (I Dovregubbens hall)</b>'+
+		'<p>The piece is played as the title character Peer Gynt, in a dream-like fantasy, enters "Dovregubben (the troll Mountain King)\'s hall". The scene\'s introduction continues: <em>There is a great crowd of troll courtiers, gnomes and goblins. Dovregubben sits on his throne, with crown and sceptre, surrounded by his children and relatives. Peer Gynt stands before him. There is a tremendous uproar in the hall.</em> The lines sung are the first lines in the scene.</p>' +
+		'<p>Grieg himself wrote "For the Hall of the Mountain King I have written something that so reeks of cowpats, ultra-Norwegianism, and \'to-thyself-be-enough-ness\' that I can\'t bear to hear it, though I hope that the irony will make itself felt."</p>'],
+
+        ["../Images/DvorakNewWorld.jpg",
+        '<h2>Dvorak New World Symphony</h2>'+
+        '<b>Spring Concert 2016</b>'+
+        '<p>Symphony No. 9 "From the New World" is easily Dvorak\'s most popular work, composed in 1893 from the influences of Native American and African-American spiritual music. Reflecting on these influences Dvorak explained: "I have simply written original themes embodying the peculiarities of the Indian music, and, using these themes as subjects, have developed them with all the resources of modern rhythms, counterpoint, and orchestral colour".</p>'+
+        '<p>Many of the themes from this symphony are widely recognised today from their use in films and advertising. </p>']
+    ]
+
+    var infoIndex = getRandomInt(0, info.length);
+    
+    function loadInfo(index)
+    {
+        if (info.length == 0) return;
+
+        var banner = document.getElementById("infobanner");
+        var host   = document.getElementById("info_host");
+
+        banner.style.backgroundImage = 'url(' + info[index][0] + ')';
+        host.innerHTML               = info[index][1];
+    }
+
+    function infoLeft()
+    {
+        if (--infoIndex == -1) { 
+            infoIndex = info.length - 1;
+        }
+        loadInfo(infoIndex)
+    }
+    function infoRight()
+    {
+        if (++infoIndex == info.length) { 
+            infoIndex = 0;
+        }
+        loadInfo(infoIndex)
+    }
+
+
+    loadInfo(infoIndex)
+</script>
+
+<div>
+    <h1>Concerts</h1>
+    <hgroup class="title">    
+    <h2>Dvorak & Williams</h2>
+    <h3>Spring Concert - Saturday, 30th April 2016</h3>
+    </hgroup>
+    <section id="loginForm">
+        <ol class="round">
+            <li>
+                <p><b>New World Symphony</b></p>
+                <p>Dvorak</p>
+                <p>Orchestra</p>
+            </li>
+            <li>
+                <p><b>Highlights from Jurassic Park</b></p>
+                <p>John Williams</p>
+                <p>Orchestra</p>
+            </li>
+            <li>
+                <p><b>Music from Star Wars</b></p>
+                <p>John Williams arr. James Renwick</p>
+                <p>String Ensemble</p>
+            </li>
+            <li>
+                <p><b>Concerning Hobits & Misty Mountains</b></p>
+                <p>Howard Shore</p>
+                <p>Gwyd and the Brasslets</p>
+            </li>
+            <li>
+                <p><b>Pavane</b></p>
+                <p>Faure arr. C. Marsh</p>
+                <p>Flute Choir</p>
+            </li>
+            <li>
+                <p><b>Don't Stop Me Now</b></p>
+                <p>Freddie Mercury</p>
+                <p>The Brasstronauts</p>
+            </li>
+        </ol>
+    </section>
+    <section id="socialLoginForm">
+        <ol class="round">
+            <li>
+                <p><b>Don't Stop Believing</b></p>
+                <p>Journey</p>
+                <p>Choir</p>
+            </li>
+            <li>
+                <p><b>The Merciful Goodness of the Lord</b></p>
+                <p>Handel</p>
+                <p>Choir and Strings</p>
+            </li>
+            <li>
+                <p><b>Seasons of Love</b></p>
+                <p>Jonathan Larson</p>
+                <p>Choir</p>
+            </li>
+            <li>
+                <p><b>Champions League Theme</b></p>
+                <p>Tony Britten</p>
+                <p>Choir and Strings</p>
+            </li>
+            <li>
+                <p><b>Locus Iste</b></p>
+                <p>Bruckner</p>
+                <p>Choir</p>
+            <li>
+                <p><b>One Day Like This</b></p>
+                <p>Elbow</p>
+                <p>Choir and Orchestra</p>
+            </li>
+            </li>
+        </ol>
+    </section>
+</div>
