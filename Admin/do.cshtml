@@ -18,10 +18,15 @@
         var piece = Request.QueryString["id"];
         if (piece != null) { LoanHelper.SetPieceFlags(piece, false, false); }
     }
+    else if (action == "removesuggestion")
+    {
+        var suggestion = Request.QueryString["id"];
+        if (suggestion != null) { Suggestions.Remove(suggestion.AsInt()); }
+    }
 
     if (redir == "TODO") { Response.RedirectPermanent("~/Admin/Loans"); }
     else if (redir == "pieces") { Response.RedirectPermanent("~/Admin/Library"); }
-
+    else if (redir == "suggestions") { Response.RedirectPermanent("~/Admin/Suggestions"); }
 }
 
 <!DOCTYPE html>
@@ -32,6 +37,6 @@
         <title></title>
     </head>
     <body>
-        
+        <h1>Please wait...</h1>
     </body>
 </html>

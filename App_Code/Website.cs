@@ -98,6 +98,20 @@ public static partial class Website
         return sb.ToString();
     }
 
+    public static string SanitiseFilename(string filename)
+    {
+        if (filename == null) return null;
+
+        var sb = new System.Text.StringBuilder(filename.Length);
+
+        var badchars = System.IO.Path.GetInvalidFileNameChars();
+
+        foreach (char c in filename) {
+            sb.Append(badchars.Contains(c) ? '_' : c);
+        }
+        return sb.ToString();
+    }
+
     /// <summary>
     /// Gets the return date for the loan.
     /// 
@@ -171,16 +185,33 @@ public static partial class Website
 
     public static void UploadHiddenFile(string filename, Stream data)
     {
+        UploadHiddenFile(filename, "", data);
+    }
+    public static void UploadHiddenFile(string filename, string subdir, Stream data)
+    {
+        string path = HttpContext.Current.Server.MapPath(Path.Combine(Website.HiddenDir, subdir));
+
         // Ensure 'Hidden' directory exists
-        Directory.CreateDirectory(HttpContext.Current.Server.MapPath("~/Hidden/"));
+        Directory.CreateDirectory(HttpContext.Current.Server.MapPath(Website.HiddenDir));
+        Directory.CreateDirectory(path);
 
         // Create or overwrite file
-        var file = File.Create(Path.Combine(
-            HttpContext.Current.Server.MapPath("~/Hidden/"), filename));
+        var file = File.Create(Path.Combine(path, filename));
 
         file.Seek(0, SeekOrigin.Begin);
         data.CopyTo(file);
         file.Close();
+    }
+
+    public static bool DeleteHiddenFile(string filepath)
+    {
+        // We're intentionally causing exceptions for now
+        filepath = Path.Combine(HttpContext.Current.Server.MapPath(Website.HiddenDir),
+            filepath);
+
+        // Delete file
+        File.Delete(filepath);
+        return true;
     }
 
     public static int ClientIntegerIP
@@ -199,6 +230,29 @@ public static partial class Website
 #pragma warning restore CS0618
             }
             return ipRaw;
+        }
+    }
+
+
+    public static string MimeTypeFromFilename(string filename)
+    {
+        switch (Path.GetExtension(filename).ToLower())
+        {
+            case ".pdf":
+                return System.Net.Mime.MediaTypeNames.Application.Pdf;
+            case ".jpg":
+            case ".jpeg":
+                return System.Net.Mime.MediaTypeNames.Image.Jpeg;
+            case ".png":
+                return "image/png";
+            case ".tiff":
+                return System.Net.Mime.MediaTypeNames.Image.Tiff;
+            case ".gif":
+                return System.Net.Mime.MediaTypeNames.Image.Gif;
+            case ".zip":
+                return System.Net.Mime.MediaTypeNames.Application.Zip;
+            default:
+                return System.Net.Mime.MediaTypeNames.Application.Octet;
         }
     }
 }

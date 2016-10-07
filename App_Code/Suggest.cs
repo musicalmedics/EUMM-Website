@@ -40,6 +40,21 @@ public static class Suggestions
         
     }
 
+    public static bool Remove(int suggestionID)
+    {
+        var user = UserHelper.GetUser();
+        var db = Database.Open(Website.DBName);
+
+        // Check if current user is admin - currently only Admins can remove suggestions
+        if (!user.IsAdmin) return false;
+
+        // Delete all associated endorsements
+        db.Execute("DELETE FROM [Endorsements2] WHERE Suggestion=@0", suggestionID);
+
+        // Delete suggestion
+        return db.Execute("DELETE FROM Suggestions WHERE Suggestion=@0", suggestionID) == 1;
+    }
+
     public static int Create(string title, bool isOrchestra, bool isChoir)
     {
         var user = UserHelper.GetUser();

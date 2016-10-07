@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 using WebMatrix.Data;
 using WebMatrix.WebData;
 
@@ -120,7 +121,8 @@ public static class LoanHelper
         var token = tokens.First();
         db.Execute("DELETE FROM DlTokens WHERE Token=@0", token.Token);
 
-        return db.QueryValue("SELECT DigitalCopyPath FROM Parts WHERE ID=@0", partID);
+        return HttpContext.Current.Server.MapPath(System.IO.Path.Combine(Website.HiddenDir, 
+            (string)db.QueryValue("SELECT DigitalCopyPath FROM Parts WHERE ID=@0", partID)));
     }
 
     public static int CreateLoan(string partID, string format, DateTime returnDate)
@@ -197,10 +199,39 @@ public static class LoanHelper
     public static int EditPart(string id, bool canLendOrig, bool canLendCopy, bool canLendDigital, 
         float deposit)
     {
-        return Database.Open(Website.DBName).Execute("UPDATE Parts SET CanLendOriginal=@0, "+
+        return Database.Open(Website.DBName).Execute("UPDATE Parts SET CanLendOriginal=@0, " +
             "CanLendCopy=@1, CanLendDigital=@2, Deposit=@3 WHERE ID=@4",
 
             (canLendOrig ? "1" : "0"), (canLendCopy ? "1" : "0"), (canLendDigital ? "1" : "0"), deposit, id);
+    }
+
+    public static string GetPartFilePath(string partID)
+    {
+        var db = Database.Open(Website.DBName);
+
+        return db.QueryValue("SELECT DigitalCopyPath FROM Parts WHERE ID=@0", partID) as string;
+    }
+
+    public static bool ReplacePartFile(string partID, string filepath)
+    {
+        var db = Database.Open(Website.DBName);
+
+        // Get previous filename
+        string previous = db.QueryValue(
+            "SELECT DigitalCopyPath FROM Parts WHERE ID=@0", partID) as string;
+
+        // Change filename
+        var count = db.Execute("UPDATE Parts SET DigitalCopyPath=@0 WHERE ID=@1", filepath, partID);
+        if (count == 0) return false;
+
+        // Now remove old file (if not the same as new one)
+        if (!String.IsNullOrWhiteSpace(previous) && 
+                (String.IsNullOrWhiteSpace(filepath) ||  
+                    System.IO.Path.GetFullPath(previous) != System.IO.Path.GetFullPath(filepath)))
+        {
+            return Website.DeleteHiddenFile(previous);
+        }
+        return true;
     }
 
     public static int AddPart(int pieceID, string instrument, string designation, int? count, bool original,

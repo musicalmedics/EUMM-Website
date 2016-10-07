@@ -1,0 +1,75 @@
+﻿@{
+    Layout = "~/Library/_SiteLayout.cshtml";
+    Page.Title = "Manage Library";
+
+    if (!UserHelper.IsAdmin()) {
+        Response.RedirectPermanent("~/Library/");
+    }
+
+    string pieceName = Request.QueryString["pieceName"] ?? "<unknown>";
+    string partName = Request.QueryString["partName"] ?? "<unknown>";
+
+    string pieceID = Request.QueryString["pieceID"];
+    string partID = Request.QueryString["partID"];
+
+
+    // Get previous filename
+    string existingFilepath = LoanHelper.GetPartFilePath(partID);
+
+
+    if (IsPost)
+    {
+        AntiForgery.Validate();
+
+        string filename = null;
+
+        if (pieceID != null && Request.Files.Count != 0)
+        {
+            // Sanitise filename
+            var file = Request.Files.Get(0);
+            filename = Website.SanitiseFilename(file.FileName);
+
+            // Upload file
+            if (file.ContentLength != 0)
+            {
+                Website.UploadHiddenFile(filename, pieceID, file.InputStream);
+            }
+
+            // If an empty filename (delete file), don't prefix with directory
+            if (!String.IsNullOrWhiteSpace(filename)) {
+                filename = System.IO.Path.Combine(pieceID, filename);
+            }
+
+            // Replace previous file if any
+            LoanHelper.ReplacePartFile(partID, filename);
+
+            // Redirect back to page
+            Response.RedirectPermanent(Request.RawUrl);
+        }
+    }
+
+
+}
+
+<hgroup class="title">
+    <h1>Manage Part Files.</h1><br/>
+    <h2>@pieceName - @partName</h2>
+</hgroup>
+<br />
+<section>
+    <h2>Existing File</h2>
+    @if (String.IsNullOrWhiteSpace(existingFilepath)) {
+        <p>No existing file.</p>
+    }else {
+        <p>@existingFilepath</p>
+    }
+</section>
+<section>
+    <h2>Replacement File</h2>
+    <br />
+    <form method="post" enctype="multipart/form-data">
+        @AntiForgery.GetHtml()
+        <input type="file" name="part-file" />
+        <button type="submit">Update File</button>
+    </form>
+</section>

@@ -29,20 +29,21 @@
 
     if (IsPost)
     {
+        AntiForgery.Validate();
         if (Request.Form["function"] == "add-part" && Validation.IsValid())
         {
-            AntiForgery.Validate();
-
             string filename = null;
             if (Request.Files.Count != 0)
             {
+                // Sanitise filename
                 var file = Request.Files.Get(0);
+                filename = Website.SanitiseFilename(filename);
 
-                if (file.ContentLength != 0)
-                {
-                    Website.UploadHiddenFile(file.FileName, file.InputStream);
+                // Upload file
+                if (file.ContentLength != 0) {
+                    Website.UploadHiddenFile(filename, pieceID.ToString(), file.InputStream);
                 }
-                filename = file.FileName;
+                filename = System.IO.Path.Combine(pieceID.ToString(), filename);
             }
 
             LoanHelper.AddPart(pieceID,
@@ -190,6 +191,8 @@
         <h2>Existing Parts</h2>
         <br />
         <form method="post" id="form">
+            @AntiForgery.GetHtml()
+
             <input type="hidden" name="function" value="set-parts" />
             <style>
                 .table-band {
@@ -205,7 +208,7 @@
                     <td><b>Can Lend Original</b></td>
                     <td><b>Can Lend Photocopy</b></td>
                     <td><b>Can Lend Digital</b></td>
-                    <!--<td><b>PDF File</b></td>-->
+                    <td><b>Digital Copy File</b></td>
                     <td></td>
                 </tr>
 
@@ -217,11 +220,11 @@
                         <td>@row.Instrument</td>
                         <td>@row.Designation</td>
                         <td>@(row.Count == null ? "-" : row.Count.ToString())</td>
-                        <td><input type="number" name="@row.ID-deposit" value="@row.Deposit" /></td>
+                        <td><input type="number" name="@row.ID-deposit" value="@row.Deposit" style="width:60px" /></td>
                         <td><input type="checkbox" name="@row.ID-loanorig" @(row.CanLendOriginal ? "checked" : "") /></td>
                         <td><input type="checkbox" name="@row.ID-loancopy" @(row.CanLendCopy ? "checked" : "") /></td>
                         <td><input type="checkbox" name="@row.ID-loanpdf" @(row.CanLendDigital ? "checked" : "") /></td>
-                        <!--<td><input type="file" name="row.ID-file"/></td>-->
+                        <td><a href="~/Admin/PartFile?pieceID=@pieceID&pieceName=@pieceTitle&partID=@row.ID&partName=@row.Designation">Manage</a></td>
                         <td>
                             <a href="~/Admin/do?redir=pieces&action=disablepart&id=@row.ID"
                                onclick="return confirm('Are you sure you wish to remove this part?')">Remove</a>

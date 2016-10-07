@@ -1,13 +1,4 @@
-﻿@{
-    if (Request.QueryString["smash"] != null) {
-        UserHelper.IsSmashing = true;
-    }
-    else if (Request.QueryString["desmash"] != null) {
-        UserHelper.IsSmashing = false;
-    }
-}
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8" />
@@ -18,22 +9,10 @@
         <link href="~/Content/themes/base/jquery.ui.all.css" rel="stylesheet" type="text/css" />
         <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
         <link href="~/Content/controls.css" rel="stylesheet" type="text/css" />
-        @if (UserHelper.IsSmashing) {
-            <title>Nigel</title>
-            <link href="~/favicon2.ico" rel="shortcut icon" type="image/x-icon" />
-            <style type="text/css">
-                .site-title:hover:after {
-                    content: "THE TEMPLE OF NIGEL";
-                }
-                .site-title:hover a {
-                    display: none;
-                }
-            </style>
-        }
-        else {
-            <title>EUMM Music Library</title>
-            <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
-        }
+
+        <title>EUMM Music Library</title>
+        <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+
         <script src="~/Scripts/jquery-1.8.2.min.js"></script>
         <script src="~/Scripts/jquery-ui-1.8.24.js"></script>
         <script src="~/Scripts/modernizr-2.6.2.js"></script>
@@ -68,12 +47,6 @@
                             <li><a href="~/Library/MyMusic">My Music</a></li>
                             <li><a href="~/Library/Recordings">Recordings</a></li>
                             <li><a href="~/Library/Suggest">Suggestions</a></li>
-
-                            @if (UserHelper.IsSmashing) {
-                            <li><a href="http://www.youtube.com/watch?v=j4eBvejTvMg">
-                                <img src="~/Images/smashing.png" style="margin:0px -15px -26px 0px" /></a>
-                            </li>
-                            }
                         </ul>
                     </nav>
                     @if (WebSecurity.IsAuthenticated && UserHelper.IsAdmin())
@@ -86,9 +59,7 @@
                             <li><a href="~/Admin/Loans">Loans (@count)</a></li>
                             <li><a href="~/Admin/Members">Members</a></li>
                             <li><a href="~/Admin/Library">Library</a></li>
-                            @if (UserHelper.IsSmashing) {
-                                <li><a href="~/Admin/Nigel">Nigel</a></li>
-                            }
+                            <li><a href="~/Admin/Suggestions">Suggestions</a></li>
                         </ul>
                         </div>
                     }

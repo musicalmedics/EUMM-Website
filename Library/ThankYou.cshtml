@@ -8,13 +8,17 @@
     {
         try
         {
-            Website.RedirectToDownload(Server.MapPath("~/Hidden/" + 
-                LoanHelper.GetDownloadPath(Request.QueryString["dl"])),
-                System.Net.Mime.MediaTypeNames.Application.Pdf,
-                Response);
+            string path = LoanHelper.GetDownloadPath(Request.QueryString["dl"]);
+            Website.RedirectToDownload(path, Website.MimeTypeFromFilename(path), Response);
         }
         catch (System.Threading.ThreadAbortException) { throw; }
-        catch (Exception e) { Response.Redirect("ThankYou?err=" + e.GetType().ToString()); }
+
+        catch (Exception e)
+        {
+            var errorType = HttpUtility.UrlEncode(e.GetType().ToString());
+            var errorDesc = HttpUtility.UrlEncode(e.Message);
+            Response.RedirectPermanent(String.Format("ThankYou?err={0}&desc={1}", errorType, errorDesc));
+        }
     }
 }
 
@@ -43,15 +47,17 @@
             <p>If your download does not start within three seconds, please click 
                 <a href="#" onclick="submitdl()">here</a> to try again.</p>
         </form>
-
-        if (UserHelper.IsSmashing) {
-            <img src="Images/ancientSmash.gif" />
-        }
     }
     else
     {
+        var errorType = Request.QueryString["err"];
+        var errorDesc = Request.QueryString["desc"];
+
         <h1>An Error Occurred</h1>
         <h3>An error occurred while attempting to service your request.
-            If this persists, please contact the <a href="mailto:@Website.Webmaster?subject=Request%20Error">administrator</a>.</h3>
+            If this persists, please contact the
+
+         <a href="mailto:@Website.Webmaster?subject=[Request%20Error]%20Online%20Library&body=@errorType%20_@errorDesc">
+            administrator</a>.</h3>
     }
 </div>
