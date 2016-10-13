@@ -43,7 +43,9 @@
                 if (file.ContentLength != 0) {
                     Website.UploadHiddenFile(filename, pieceID.ToString(), file.InputStream);
                 }
-                filename = System.IO.Path.Combine(pieceID.ToString(), filename);
+                if (filename != null) {
+                    filename = System.IO.Path.Combine(pieceID.ToString(), filename);
+                }
             }
 
             LoanHelper.AddPart(pieceID,
