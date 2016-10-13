@@ -37,7 +37,7 @@
             {
                 // Sanitise filename
                 var file = Request.Files.Get(0);
-                filename = Website.SanitiseFilename(filename);
+                filename = Website.SanitiseFilename(file.FileName);
 
                 // Upload file
                 if (file.ContentLength != 0) {
