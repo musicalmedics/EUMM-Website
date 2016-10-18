@@ -57,7 +57,7 @@
         }
         else if (Request.Form["function"] == "set-parts")
         {
-            var partFlags = Request.Form.Cast<string>().Where(k => k != "function")
+            var partFlags = Request.Form.Cast<string>().Where(k => k.Length > 0 && char.IsNumber(k[0]))
                 .ToLookup(k => k.Split('-')[0], k => k.Split('-')[1]);
 
             foreach (string id in partFlags.Select(g => g.Key))
@@ -226,7 +226,7 @@
                         <td><input type="checkbox" name="@row.ID-loanpdf" @(row.CanLendDigital ? "checked" : "") /></td>
                         <td><a href="~/Admin/PartFile?pieceID=@pieceID&pieceName=@pieceTitle&partID=@row.ID&partName=@row.Designation">Manage</a></td>
                         <td>
-                            <a href="~/Admin/do?redir=pieces&action=disablepart&id=@row.ID"
+                            <a href="~/Admin/do?redir=parts&action=disablepart&id=@row.ID&piece=@pieceID&"
                                onclick="return confirm('Are you sure you wish to remove this part?')">Remove</a>
                             <input type="hidden" name="@row.ID-id" />
                         </td>

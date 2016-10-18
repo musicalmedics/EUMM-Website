@@ -205,6 +205,11 @@ public static class LoanHelper
             (canLendOrig ? "1" : "0"), (canLendCopy ? "1" : "0"), (canLendDigital ? "1" : "0"), deposit, id);
     }
 
+    public static int HidePart(string partID)
+    {
+        return Database.Open(Website.DBName).Execute("UPDATE Parts SET IsPresent='0' WHERE ID=@0", partID);
+    }
+
     public static string GetPartFilePath(string partID)
     {
         var db = Database.Open(Website.DBName);
