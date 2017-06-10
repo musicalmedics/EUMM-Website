@@ -9,13 +9,10 @@
     }    
 
     var info = [
-        /*["../Images/library.jpg",
+        ["../Images/library.jpg",
         '<h2>Suggest Pieces for Next Semester</h2>' +
         '<p>Quickly and easily make suggestions for pieces for us to play next semester with the new <em><a href="/Library/Suggest">Suggestions</a></em> page. ' +
-        'Here you can view others\' suggestions, \'endorse\' them and search for videos of existing performances.</p>'],*/
-        ["../Images/Amber1.jpg",
-            "<h2>All hail the librarian</h2>" + 
-            "<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>"]
+        'Here you can view others\' suggestions, \'endorse\' them and search for videos of existing performances.</p>'],
     ]
 
     var infoIndex = getRandomInt(0, info.length);
@@ -49,14 +46,6 @@
 
     loadInfo(infoIndex)
 </script>
-
-@if (UserHelper.IsSmashing) {
-<script>
-    info.push(["../Images/nigel_escape.gif", 
-    '<div style="height:216px"><h2>Nigel</h2><p>nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel</p>' +
-    '<p>nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel nigel</p></div>'])
-</script>
-}
 
 @section featured {
 <section class="featured">

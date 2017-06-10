@@ -255,4 +255,19 @@ public static partial class Website
                 return System.Net.Mime.MediaTypeNames.Application.Octet;
         }
     }
+
+
+    public static T WithDatabase<T>(Func<WebMatrix.Data.Database, T> lambda)
+    {
+        using (var db = WebMatrix.Data.Database.Open(Website.DBName)) {
+            return lambda.Invoke(db);
+        }
+    }
+    public static void WithDatabase(Action<WebMatrix.Data.Database> lambda)
+    {
+        using (var db = WebMatrix.Data.Database.Open(Website.DBName)) {
+            lambda.Invoke(db);
+        }
+    }
+
 }

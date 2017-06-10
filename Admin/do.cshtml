@@ -11,17 +11,22 @@
     if (action == "cancel")
     {
         var reqID = Request.QueryString["req"];
-        if (reqID != null) { LoanHelper.CancelRequest(reqID.AsInt()); }
+        if (reqID != null) { LibraryHelper.CancelRequest(reqID.AsInt()); }
     }
     else if (action == "disablepiece")
     {
         var piece = Request.QueryString["id"];
-        if (piece != null) { LoanHelper.SetPieceFlags(piece, false, false); }
+        if (piece != null) { LibraryHelper.SetPieceFlags(piece, false, false); }
     }
     else if (action == "disablepart")
     {
         var part = Request.QueryString["id"];
-        if (part != null) { LoanHelper.HidePart(part); }
+        if (part != null) { LibraryHelper.HidePart(part); }
+    }
+    else if (action == "disablegroup")
+    {
+        var group = Request.QueryString["id"];
+        if (group != null) { LibraryHelper.HideGroup(group); }
     }
     else if (action == "removesuggestion")
     {
@@ -33,6 +38,8 @@
     else if (redir == "pieces") { Response.RedirectPermanent("~/Admin/Library"); }
     else if (redir == "suggestions") { Response.RedirectPermanent("~/Admin/Suggestions"); }
     else if (redir == "parts") { Response.RedirectPermanent(Request.UrlReferrer.ToString()); }
+    else if (redir == "groups") { Response.RedirectPermanent("~/Admin/Groups"); }
+
 }
 
 <!DOCTYPE html>

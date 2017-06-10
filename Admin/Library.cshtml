@@ -33,7 +33,7 @@
             DateTime? dPerf = (String.IsNullOrWhiteSpace(Request.Form["nextperform"]) ? null :
                 (DateTime?)Request.Form["nextperform"].AsDateTime());
 
-            int id = LoanHelper.AddPiece(
+            int id = LibraryHelper.AddPiece(
                 Request.Form["title"],
                 Request.Form["author"],
                 Request.Form["library"].AsInt(),
@@ -55,12 +55,12 @@
                 .ToLookup(k => k.Split('-')[0], k => k.Split('-')[1]);
 
             foreach (string id in pieceFlags.Select(g => g.Key)) {
-                LoanHelper.SetPieceFlags(id, pieceFlags[id].Contains("loanable"), true);
+                LibraryHelper.SetPieceFlags(id, pieceFlags[id].Contains("loanable"), true);
             }
         }
     }
 
-    var pieces = LoanHelper.GetPieces();
+    var pieces = LibraryHelper.GetPieces();
 
 }
 

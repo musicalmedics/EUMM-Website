@@ -4,8 +4,8 @@ using System.Collections.Specialized;
 using System.Collections.Generic;
 using WebMatrix.Data;
 using WebMatrix.WebData;
-using System.Web.Security;
 using System.Web;
+using System.Web.WebPages;
 
 /// <summary>
 /// Summary description for UserHelper
@@ -60,6 +60,24 @@ public static class UserHelper
         else throw new Exception("More than one member matches the given UUN");
     }
 
+    public static Tuple<string, string> SplitFullName(string fullName)
+    {
+        fullName = fullName.Trim();
+
+        // Split into first & last names
+        string firstname = "", lastname = "";
+
+        int index = fullName.LastIndexOf(' ');
+        if (index != -1)
+        {
+            firstname = fullName.Substring(index);
+            lastname = fullName.Substring(0, index);
+        }
+        else lastname = fullName;
+
+        return new Tuple<string, string>(firstname, lastname);
+    }
+
     public static dynamic GetUser()
     {
         // Open the database & look for the user
@@ -75,6 +93,11 @@ public static class UserHelper
         // Open the database & look for the user
         var db  = Database.Open(Website.DBName);
         return db.QuerySingle("SELECT * FROM Members WHERE UUN=@0", studentID);
+    }
+    public static dynamic GetUser(string firstName, string lastName)
+    {
+        return Website.WithDatabase((db) => db.QuerySingle(
+            "SELECT * FROM Members WHERE FirstName=@0 AND LastName=@1 AND IsMember='1'", firstName, lastName));
     }
 
     public static int ConfirmUser(string studentID, NameValueCollection form)
@@ -199,13 +222,47 @@ public static class UserHelper
             (isActive ? "1" : "0"), (isOrchestra ? "1" : "0"), (isChoir ? "1" : "0"), (isAdmin ? "1" : "0"), uun);
     }
 
-    ///<summary>Easter Egg!</summary>
-    public static bool IsSmashing
+
+    public class MemberFullNameValidator : RequestFieldValidatorBase
     {
-        get {
-            return (WebSecurity.CurrentUserName == "s1311545" && (string)Website.Session["smash"] != "False") 
-                || (string)Website.Session["smash"] == "True"; 
+        protected bool optional;
+
+        public MemberFullNameValidator(bool optional = false) 
+            : base("The given full name is either not present " 
+            + "or is ambiguous. Use the student number.")
+        {
+            this.optional = optional;
         }
-        set { Website.Session["smash"] = value.ToString(); }
+
+        protected override bool IsValid(HttpContextBase httpContext, string value)
+        {
+            // Get field value
+            if (optional && String.IsNullOrWhiteSpace(value)) return true;
+            var name = UserHelper.SplitFullName(value);
+
+            // Check if present in database
+            try { UserHelper.GetUser(name.Item1, name.Item2).UUN.ToString(); return true; }
+            catch { return false; }
+        }
+    }
+
+    public class MemberUUNValidator : RequestFieldValidatorBase
+    {
+        protected bool optional;
+
+        public MemberUUNValidator(bool optional = false) 
+            : base("A member with the given student number could not be found.")
+        {
+            this.optional = optional;
+        }
+
+        protected override bool IsValid(HttpContextBase httpContext, string value)
+        {
+            if (optional && String.IsNullOrWhiteSpace(value)) return true;
+
+            // Check if present in database
+            try { UserHelper.GetUser(value).UUN.ToString(); return true; }
+            catch { return false; }
+        }
     }
 }

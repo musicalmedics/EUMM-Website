@@ -9,7 +9,7 @@
         return;
     }
 
-    var pieces = LoanHelper.GetLoanablePieces();
+    var pieces = LibraryHelper.GetLoanablePieces();
 
     IEnumerable<dynamic> parts = null, loans = null;
 
@@ -22,7 +22,7 @@
         var part = Request.Form["part"];
         var format = Request.Form["format"];
 
-        parts = LoanHelper.GetParts(piece);
+        parts = LibraryHelper.GetParts(piece);
 
         // Get the actual record for the pieceID
         foreach (var p in pieces)
@@ -39,17 +39,17 @@
             }
             if (partRecord != null)
             {
-                loans = LoanHelper.GetCurrentLoans(part);
+                loans = LibraryHelper.GetCurrentLoans(part);
             }
         }
 
         // User sumbmitted complete form - now attempt to create loan
         if (!String.IsNullOrWhiteSpace(format))
         {
-            if (LoanHelper.CanLoan(partRecord))
+            if (LibraryHelper.CanLoan(partRecord))
             {
                 // Create new loan record
-                LoanHelper.CreateLoan(part, format, Website.CalculateReturnDate(pieceRecord));
+                LibraryHelper.CreateLoan(part, format, Website.CalculateReturnDate(pieceRecord));
 
                 // Perform download of resource if available
                 if (format == Website.Format_DigitalCopy.ToString())
@@ -112,7 +112,7 @@
             <div class="panel" data-number="3">
                 <h2 class="title">Request Loan</h2>
                 <div class="content">
-                    @if (partRecord.Count != null && LoanHelper.IsRenting(loans))
+                    @if (partRecord.Count != null && LibraryHelper.IsRenting(loans))
                     {
                     <p>
                         Our records show that you are currently renting a copy of this part.

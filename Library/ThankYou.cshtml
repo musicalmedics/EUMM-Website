@@ -8,7 +8,7 @@
     {
         try
         {
-            string path = LoanHelper.GetDownloadPath(Request.QueryString["dl"]);
+            string path = LibraryHelper.GetDownloadPath(Request.QueryString["dl"]);
             Website.RedirectToDownload(path, Website.MimeTypeFromFilename(path), Response);
         }
         catch (System.Threading.ThreadAbortException) { throw; }

@@ -1,0 +1,163 @@
+﻿@using WebMatrix.WebData;
+@section Scripts {
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+}
+@{
+    Layout     = "~/Library/_SiteLayout.cshtml";
+    Page.Title = "Manage Library";
+
+    if (!UserHelper.IsAdmin()) {
+        Response.RedirectPermanent("~/Library/");
+    }
+
+
+    // Gets the piece ID
+    int groupID = 1;
+    int.TryParse(Request.QueryString["groupID"], out groupID);
+
+    if (groupID < 0) {
+        Response.RedirectPermanent("~/Library/ThankYou?err=InvalidGroupID");
+    }
+
+    string groupName = Request.QueryString["groupName"] ?? "#Error: Unable to get name";
+
+    if (IsPost)
+    {
+        AntiForgery.Validate();
+        if (Request.Form["function"] == "add-member" )
+        {
+            Validation.Add("fullname", new UserHelper.MemberFullNameValidator(true));
+            Validation.Add("uun", new UserHelper.MemberUUNValidator(true));
+
+            if (Validation.IsValid())
+            {
+                dynamic member = null;
+
+                // One of the two must be provided
+                bool haveFullname = !String.IsNullOrWhiteSpace(Request.Form["fullname"]);
+                bool haveUUN = !String.IsNullOrWhiteSpace(Request.Form["uun"]);
+
+                if (!haveFullname && !haveUUN)
+                {
+                    Validation.AddFormError("One of 'Full Name' or 'Student Number' must be provided.");
+                }
+                else if (haveFullname && haveUUN)
+                {
+                    Validation.AddFormError("Only one of 'Full Name' or 'Student Number' can be provided.");
+                }
+
+                else if (haveFullname)
+                {
+                    var name = UserHelper.SplitFullName(Request.Form["fullname"].Trim());
+                    member = UserHelper.GetUser(name.Item1, name.Item2);
+                }
+                else if (haveUUN)
+                {
+                    member = UserHelper.GetUser(Request.Form["uun"].Trim());
+                }
+
+                LibraryHelper.AddMemberToGroup(groupID, member.UUN);
+            }
+        }
+        else if (Request.Form["function"] == "remove-member")
+        {
+            Validation.RequireField("remove-uun");
+
+            if (Validation.IsValid()) {
+                LibraryHelper.RemoveMemberFromGroup(groupID, Request.Form["remove-uun"].Trim());
+            }
+        }
+    }
+    var members = LibraryHelper.GetGroupMembers(groupID);
+}
+<div>
+    <hgroup class="title">
+        <h1>Administration.</h1>
+        <h2>Members for '@groupName'</h2>
+    </hgroup>
+    
+    <br />
+
+    <section>
+        <h2>Add Member</h2>
+        <form method="post" enctype="multipart/form-data">
+            @AntiForgery.GetHtml()
+            <input type="hidden" name="function" value="add-member" />
+
+            <h3>Member</h3>
+            <p>Please provide either a correct full name or the member's student number.</p>
+            <table>
+                <thead style="font-weight: bold">
+                    <tr>
+                        <td>Full Name</td>
+                        <td>Student Number</td>
+                    </tr>
+                </thead>
+                <tr>
+                    <td><input type="text" title="The member's full name" name="fullname" placeholder="E.g. Nigel Thornberry" @Validation.For("fullname") /></td>
+                    <td><input type="text" title="The member's student number" name="uun" placeholder="E.g. s1234567" @Validation.For("uun") /></td>
+                </tr>
+            </table>
+
+            <br />
+            @Html.ValidationSummary("Please re-enter any incorrect inputs before continuing.", excludeFieldErrors: false, htmlAttributes: null)
+            <br/>
+            <button type="submit">Add Member</button>
+        </form>
+    </section>
+
+    <br />
+    <br />
+
+    <section>
+        <h2>Existing Members</h2>
+        <br />
+        <form method="post" id="form">
+            @AntiForgery.GetHtml()
+
+            <input type="hidden" name="function" value="set-parts" />
+            <style>
+                .table-band {
+                    background-color: #DDD;
+                }
+            </style>
+            <table>
+                <tr>
+                    <td><b>Instrument</b></td>
+                    <td><b>Designation</b></td>
+                    <td><b>Number Available</b></td>
+                    <td><b>Deposit</b></td>
+                    <td><b>Can Lend Original</b></td>
+                    <td><b>Can Lend Photocopy</b></td>
+                    <td><b>Can Lend Digital</b></td>
+                    <td><b>Digital Copy File</b></td>
+                    <td></td>
+                </tr>
+
+                @{ bool color = true; }
+                @foreach (var row in members)
+                {
+                    color = !color;
+                    <tr class="@(color?"table-band":"")">
+                        <td>@row.Instrument</td>
+                        <td>@row.Designation</td>
+                        <td>@(row.Count == null ? "-" : row.Count.ToString())</td>
+                        <td><input type="number" name="@row.ID-deposit" value="@row.Deposit" style="width:60px" /></td>
+                        <td><input type="checkbox" name="@row.ID-loanorig" @(row.CanLendOriginal ? "checked" : "") /></td>
+                        <td><input type="checkbox" name="@row.ID-loancopy" @(row.CanLendCopy ? "checked" : "") /></td>
+                        <td><input type="checkbox" name="@row.ID-loanpdf" @(row.CanLendDigital ? "checked" : "") /></td>
+                        <td>
+                            <a href="~/Admin/do?redir=parts&action=disablepart&id=@row.ID&piece=@groupID&"
+                               onclick="return confirm('Are you sure you wish to remove this part?')">Remove</a>
+                            <input type="hidden" name="@row.ID-id" />
+                        </td>
+                    </tr>
+                }
+            </table>
+            <br />
+            <input type="submit" value="Update Parts" />
+        </form>
+    </section>
+
+</div>

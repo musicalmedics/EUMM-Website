@@ -31,7 +31,7 @@
         }
     }
     var view  = UserHelper.GetRequests();
-    var loans = LoanHelper.GetAllCurrentLoans();
+    var loans = LibraryHelper.GetAllCurrentLoans();
 
 }
 
@@ -71,10 +71,9 @@
     @foreach (var row in view)
     {
         var title = row.FirstName + ' ' + row.LastName;
-        var name  = UserHelper.IsSmashing?"Nigel Thornberry":title;
         <tr>
             <td><input type="checkbox" title="Select Row" name=@row.ID /></td>
-            <td title="@title">@name</td>
+            <td title="@title">@title</td>
             <td>@row.Title</td>
             <td>@row.Designation</td>
             <td>@Website.GetLoanFormatName(row.Format)</td>
@@ -114,10 +113,9 @@
     @foreach (var row in loans)
     {
         var title = row.FirstName + ' ' + row.LastName;
-        var name  = UserHelper.IsSmashing?"Nigel Thornberry":title;
         <tr>
             <td><input type="checkbox" title="Select Row" name=@row.ID /></td>
-            <td title="@title">@name</td>
+            <td title="@title">@title</td>
             <td>@row.Title</td>
             <td>@row.Designation</td>
             <td>@Website.GetLoanFormatName(row.Format)</td>

@@ -48,7 +48,7 @@
                 }
             }
 
-            LoanHelper.AddPart(pieceID,
+            LibraryHelper.AddPart(pieceID,
                 Request.Form["instrument"],
                 Request.Form["designation"],
                 Request.Form["limited"] == "on" ? (int?)int.Parse(Request.Form["count"]) : null,
@@ -64,7 +64,7 @@
 
             foreach (string id in partFlags.Select(g => g.Key))
             {
-                LoanHelper.EditPart(id,
+                LibraryHelper.EditPart(id,
                     partFlags[id].Contains("loanorig"),
                     partFlags[id].Contains("loancopy"),
                     partFlags[id].Contains("loanpdf"),
@@ -74,7 +74,7 @@
         }
     }
 
-    var parts = LoanHelper.GetParts(pieceID.ToString());
+    var parts = LibraryHelper.GetParts(pieceID.ToString());
 }
 
 <div>

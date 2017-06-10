@@ -14,7 +14,7 @@
 
 
     // Get previous filename
-    string existingFilepath = LoanHelper.GetPartFilePath(partID);
+    string existingFilepath = LibraryHelper.GetPartFilePath(partID);
 
 
     if (IsPost)
@@ -41,7 +41,7 @@
             }
 
             // Replace previous file if any
-            LoanHelper.ReplacePartFile(partID, filename);
+            LibraryHelper.ReplacePartFile(partID, filename);
 
             // Redirect back to page
             Response.RedirectPermanent(Request.RawUrl);

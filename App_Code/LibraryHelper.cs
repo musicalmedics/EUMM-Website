@@ -8,7 +8,7 @@ using WebMatrix.WebData;
 /// <summary>
 /// Summary description for LoanHelper
 /// </summary>
-public static class LoanHelper
+public static class LibraryHelper
 {
     public static IEnumerable<dynamic> GetInstrumentList()
     {
@@ -245,12 +245,79 @@ public static class LoanHelper
         if (String.IsNullOrWhiteSpace(instrument)) instrument = null;
         if (String.IsNullOrWhiteSpace(designation)) designation = null;
 
-
         return Database.Open(Website.DBName).Execute("INSERT INTO Parts " +
             "(Piece,Instrument,Designation,Count,CanLendOriginal,CanLendCopy,CanLendDigital,DigitalCopyPath,Deposit) " +
             "VALUES (@0,@1,@2,@3,@4,@5,@6,@7,@8)",
 
             pieceID, instrument, designation, count, original ? "1" : "0", paper ? "1" : "0", digital ? "1" : "0",
             filepath, deposit);
+    }
+
+    public static int AddGroup(string name, string description, string creator, bool active)
+    {
+        if (String.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Invalid argument: group name is empty");
+        if (String.IsNullOrWhiteSpace(description))
+            throw new ArgumentException("Invalid argument: group description is empty");
+
+        return Website.WithDatabase((db) => 
+            db.Execute("INSERT INTO Groups (Name, Description, CreatorUUN, Active) VALUES (@0, @1, @2, @3)",
+                name, description, creator, active ? "1" : "0")
+        );
+    }
+
+    public static IEnumerable<dynamic> GetGroups()
+    {
+        return Website.WithDatabase((db) =>
+        {
+            var rows = db.Query("SELECT * FROM Groups WHERE IsPresent='1'");
+            // Join with Members to get creator
+            return Website.ExpandoFromTable(rows).Select((r) => {
+                r.Creator = Website.ExpandoFromRow(db.QuerySingle("SELECT * FROM Members WHERE UUN=@0", r.CreatorUUN));
+                return r;
+            });
+        });
+    }
+
+    public static int CountGroupMembers(int groupID)
+    {
+        return 0;
+        //return Website.WithDatabase((db) => {
+        //    return (int)db.QueryValue("SELECT COUNT(1) FROM GroupMembers WHERE Group=@0", groupID);
+        //});
+    }
+
+    public static int SetGroupFlags(string id, bool active, bool present)
+    {
+        return Website.WithDatabase((db) => {
+            return db.Execute("UPDATE Groups SET Active=@0, IsPresent=@1 WHERE ID=@2",
+                (active ? "1" : "0"), (present ? "1" : "0"), id);
+        });
+    }
+
+    public static int HideGroup(string id)
+    {
+        return Website.WithDatabase((db) => {
+            return db.Execute("UPDATE Groups SET IsPresent='0' WHERE ID=@0", id);
+        });
+    }
+
+    public static int AddMemberToGroup(int groupID, string memberUUN)
+    {
+        return Website.WithDatabase((db) => {
+            return (int)db.Execute("INSERT INTO GroupMembers (Group, Member) VALUES (@0, @1)", groupID, memberUUN);
+        });
+    }
+
+    public static int RemoveMemberFromGroup(int groupID, string memberUUN)
+    {
+        return Website.WithDatabase((db) => {
+            return (int)db.Execute("DELETE FROM GroupMembers WHERE Group=@0 AND Member=@1", groupID, memberUUN);
+        });
+    }
+
+    public static IEnumerable<dynamic> GetGroupMembers(int groupID)
+    {
+        throw new NotImplementedException();
     }
 }
