@@ -27,7 +27,8 @@
                 Request.Form["name"],
                 Request.Form["desc"],
                 UserHelper.GetUser().UUN,
-                Request.Form["active"] == "on");
+                Request.Form["active"] == "on",
+                Request.Form["cansuggest"] == "on");
 
             // Redirect to parts page for new piece
             Response.Redirect(String.Format("~/Admin/GroupMembers?groupID={0}&groupName={1}",
@@ -38,8 +39,10 @@
             var groupFlags = Request.Form.Cast<string>().Where(k => k != "function")
                 .ToLookup(k => k.Split('-')[0], k => k.Split('-')[1]);
 
-            foreach (string id in groupFlags.Select(g => g.Key)) {
-                LibraryHelper.SetGroupFlags(id, groupFlags[id].Contains("active"), true);
+            foreach (string id in groupFlags.Select(g => g.Key))
+            {
+                LibraryHelper.SetGroupFlags(id, groupFlags[id].Contains("active"),
+                    groupFlags[id].Contains("cansuggest"), true);
             }
         }
     }
@@ -70,8 +73,12 @@
                     <td><input type="text" name="desc" @Validation.For("desc") /></td>
                 </tr>
                 <tr title="Is the group active (visible to members)">
-                    <td><b @if (errDescription) { <text> class="error-label" </text>  }>Is Active</b></td>
+                    <td><b>Is Active</b></td>
                     <td><input type="checkbox" name="active" checked /></td>
+                </tr>
+                <tr title="Whether to allow users to suggest pieces for this group">
+                    <td><b>Allow Suggestions</b></td>
+                    <td><input type="checkbox" name="cansuggest" checked /></td>
                 </tr>
             </table>
             <br/>
@@ -84,7 +91,7 @@
         <h2>All Groups</h2>
         <br />
         <form method="post" id="form">
-            <input type="hidden" name="function" value="set-piece" />
+            <input type="hidden" name="function" value="set-group" />
             <style>
                 .table-band { background-color: #DDD }
             </style>
@@ -95,6 +102,7 @@
                     <td><b>Creator</b></td>
                     <td><b>Members</b></td>
                     <td><b>Is Active</b></td>
+                    <td><b>Allow Suggestions</b></td>
                     <td></td>
                     <td></td>
                 </tr>
@@ -109,12 +117,15 @@
                         <td>@row.Creator.FirstName @row.Creator.LastName</td>
                         <td>@LibraryHelper.CountGroupMembers(row.ID)</td>
                         <td><input type="checkbox" name="@row.ID-active" @(row.Active ? "checked" : "") /></td>
+                        <td><input type="checkbox" name="@row.ID-cansuggest" @(row.CanSuggest ? "checked" : "") /></td>
                         <td>
                             <a href="~/Admin/GroupMembers?groupID=@row.ID&groupName=@Uri.EscapeDataString(row.Name)">Members</a>
                         </td>
                         <td>
+                            @if (row.ID != Website.Library_Orchestra && row.ID != Website.Library_Choir) {
                             <a href="~/Admin/do?redir=groups&action=disablegroup&id=@row.ID"
                                onclick="return confirm('Are you sure you wish to remove this group?')">Remove</a>
+                            }
                             <input type="hidden" name="@row.ID-id" />
                         </td>
                     </tr>

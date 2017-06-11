@@ -55,30 +55,34 @@ public static class Suggestions
         return db.Execute("DELETE FROM Suggestions WHERE Suggestion=@0", suggestionID) == 1;
     }
 
-    public static int Create(string title, bool isOrchestra, bool isChoir)
+    public static int Create(string title, int groupID)
     {
         var user = UserHelper.GetUser();
         var db   = Database.Open(Website.DBName);
 
-        var res = db.QueryValue("INSERT INTO Suggestions(Title,IsOrchestra,IsChoir,CreatorUUN) OUTPUT INSERTED.Suggestion VALUES (@0, @1, @2, @3)", 
-            title.Length <= 120 ? title : title.Substring(0, 120), isOrchestra, isChoir, user.UUN);
+        var res = db.QueryValue("INSERT INTO Suggestions(Title,[Group],CreatorUUN) OUTPUT INSERTED.Suggestion VALUES (@0, @1, @2)", 
+            title.Length <= 120 ? title : title.Substring(0, 120), groupID, user.UUN);
 
         // Endorse your suggestion
         ToggleEndorse((int)res);
         return (int)res;
     }
-    
+
     public static IEnumerable<dynamic> GetAll()
     {
-        var db = Database.Open(Website.DBName);
-
-        // Order by votes
-        var res = db.Query(@"SELECT Suggestions.Suggestion, Title, IsChoir, IsOrchestra FROM Suggestions 
+        return Website.WithDatabase((db) =>
+        {
+            // Order by votes
+            var rows = db.Query(@"SELECT Suggestions.Suggestion, Title, [Group] FROM Suggestions 
                              JOIN Endorsements2 ON Suggestions.Suggestion=Endorsements2.Suggestion
                              WHERE Suggestions.Active='1'
-                             GROUP BY Suggestions.Suggestion, Title, IsChoir, IsOrchestra
+                             GROUP BY Suggestions.Suggestion, Title, [Group]
                              ORDER BY count(Suggestions.Suggestion) DESC");
-        return res;
+
+            return Website.ExpandoFromTable(rows).Select((r) => {
+                r.Group = db.QuerySingle("SELECT * FROM Groups WHERE ID=@0", r.Group); return r;
+            });
+        });
     }
 
     public static IEnumerable<int> GetEndorsed()

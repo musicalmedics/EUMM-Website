@@ -9,7 +9,7 @@
     bool errTitle = false;
 
     IEnumerable<int> endorsed = new int[0];
-    
+
     if (IsPost)
     {
         if (Request.Form["action"] == "endorse")
@@ -19,6 +19,8 @@
         else if (Request.Form["action"] == "suggest")
         {
             Validation.RequireField("title", "You must specify the piece title and, optionally, author.");
+            Validation.RequireField("group", "You must choose the group for which to make the suggestion.");
+
             errTitle = !ModelState.IsValidField("title");
 
             AntiForgery.Validate();
@@ -26,14 +28,13 @@
             {
                 Suggestions.Create(
                     Request.Form["title"],
-                    "on".Equals(Request.Form["isOrchestra"]),
-                    "on".Equals(Request.Form["isChoir"])
+                    Request.Form["group"].AsInt()
                 );
             }
         }
         else { throw new Exception("Unknown action."); }
     }
-    
+
     endorsed = Suggestions.GetEndorsed().Cast<int>();
 }
 
@@ -100,8 +101,7 @@
             { 
             <li class="suggestion">
                 <div class="suggest">
-                    <h3>@entry.Title</h3><p>@if (entry.IsChoir) { <text>Choir &nbsp;</text> } 
-                    @if (entry.IsOrchestra) { <text>Orchestra</text> } &nbsp;</p>
+                    <h3>@entry.Title</h3><p title="@entry.Group.Description">@entry.Group.Name &nbsp;</p>
                 </div>
                 <div class="buttons">
                     <img class="button" src="~/Images/thumb.png" title="Endorse/Unendorse suggestion" data-id="@entry.Suggestion" onclick="endorse(this)" 
@@ -122,21 +122,20 @@
             <input type="hidden" name="action" value="suggest" />
             <label @if (errTitle){ <text> class="error-label" </text>  }>Title &amp; Author</label>
             <input type="text" name="title" @Validation.For("title") />
-            <div>
-                <input type="checkbox" name="isChoir">&nbsp;Choir</input>
-            </div>
-            <div>
-                <input type="checkbox" name="isOrchestra">&nbsp;Orchestra</input>
-            </div>
+
+            @foreach (var group in LibraryHelper.GetGroups())
+            {
+                if (!group.CanSuggest) { continue; }
+
+                <div title="@group.Description">
+                    <input type="radio" style="width:initial" id="r-@group.ID" name="group" value="@group.ID" @Validation.For("group")/>
+                    <label style="display:inline" for="r-@group.ID">@group.Name</label>
+                </div>
+            }
             <br />
             <input type="submit" value="Add" />
         </form>
         <br />
         @Html.ValidationSummary("Please correct the following input errors:", excludeFieldErrors: false, htmlAttributes: null)
     </section>
-
-    <p>
-        This page is a work in progress. Please leave feedback
-        <a href="mailto:jsrenwick3@gmail.com?subject=Piece%20Suggestion%20Feedback">here</a>.
-    </p>
 </div>

@@ -253,7 +253,7 @@ public static class LibraryHelper
             filepath, deposit);
     }
 
-    public static int AddGroup(string name, string description, string creator, bool active)
+    public static int AddGroup(string name, string description, string creator, bool active, bool canSuggest)
     {
         if (String.IsNullOrWhiteSpace(name))
             throw new ArgumentException("Invalid argument: group name is empty");
@@ -261,8 +261,8 @@ public static class LibraryHelper
             throw new ArgumentException("Invalid argument: group description is empty");
 
         return Website.WithDatabase((db) => 
-            db.Execute("INSERT INTO Groups (Name, Description, CreatorUUN, Active) VALUES (@0, @1, @2, @3)",
-                name, description, creator, active ? "1" : "0")
+            db.Execute("INSERT INTO Groups (Name, Description, CreatorUUN, Active, CanSuggest) VALUES (@0, @1, @2, @3, @4)",
+                name, description, creator, active ? "1" : "0", canSuggest ? "1" : "0")
         );
     }
 
@@ -281,17 +281,16 @@ public static class LibraryHelper
 
     public static int CountGroupMembers(int groupID)
     {
-        return 0;
-        //return Website.WithDatabase((db) => {
-        //    return (int)db.QueryValue("SELECT COUNT(1) FROM GroupMembers WHERE Group=@0", groupID);
-        //});
+        return Website.WithDatabase((db) => {
+            return (int)db.QueryValue("SELECT COUNT(1) FROM GroupMembers WHERE [Group]=@0", groupID);
+        });
     }
 
-    public static int SetGroupFlags(string id, bool active, bool present)
+    public static int SetGroupFlags(string id, bool active, bool canSuggest, bool present)
     {
         return Website.WithDatabase((db) => {
-            return db.Execute("UPDATE Groups SET Active=@0, IsPresent=@1 WHERE ID=@2",
-                (active ? "1" : "0"), (present ? "1" : "0"), id);
+            return db.Execute("UPDATE Groups SET Active=@0, CanSuggest=@1, IsPresent=@2 WHERE ID=@3",
+                (active ? "1" : "0"), (canSuggest ? "1" : "0"),(present ? "1" : "0"), id);
         });
     }
 
@@ -305,19 +304,21 @@ public static class LibraryHelper
     public static int AddMemberToGroup(int groupID, string memberUUN)
     {
         return Website.WithDatabase((db) => {
-            return (int)db.Execute("INSERT INTO GroupMembers (Group, Member) VALUES (@0, @1)", groupID, memberUUN);
+            return (int)db.Execute("INSERT INTO GroupMembers ([Group], Member) VALUES (@0, @1)", groupID, memberUUN);
         });
     }
 
     public static int RemoveMemberFromGroup(int groupID, string memberUUN)
     {
         return Website.WithDatabase((db) => {
-            return (int)db.Execute("DELETE FROM GroupMembers WHERE Group=@0 AND Member=@1", groupID, memberUUN);
+            return (int)db.Execute("DELETE FROM GroupMembers WHERE [Group]=@0 AND Member=@1", groupID, memberUUN);
         });
     }
 
     public static IEnumerable<dynamic> GetGroupMembers(int groupID)
     {
-        throw new NotImplementedException();
+        return Website.WithDatabase((db) => {
+            return db.Query("SELECT M.* FROM GroupMembers GM JOIN Members M ON GM.Member=M.UUN WHERE [Group]=@0", groupID);
+        });
     }
 }

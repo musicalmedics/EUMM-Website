@@ -26,12 +26,21 @@
     else if (action == "disablegroup")
     {
         var group = Request.QueryString["id"];
-        if (group != null) { LibraryHelper.HideGroup(group); }
+        if (group.AsInt() == Website.Library_Orchestra || group.AsInt() == Website.Library_Choir) {
+            Response.Redirect("~/Library/ThankYou?err=InvalidOperationException&desc=Cannot%20remove%20primary%20groups");
+        }
+        else if (group != null) { LibraryHelper.HideGroup(group); }
     }
     else if (action == "removesuggestion")
     {
         var suggestion = Request.QueryString["id"];
         if (suggestion != null) { Suggestions.Remove(suggestion.AsInt()); }
+    }
+    else if (action == "removemember")
+    {
+        var member = Request.QueryString["id"];
+        var group = Request.QueryString["group"];
+        LibraryHelper.RemoveMemberFromGroup(group.AsInt(), member);
     }
 
     if (redir == "TODO") { Response.RedirectPermanent("~/Admin/Loans"); }
@@ -39,6 +48,7 @@
     else if (redir == "suggestions") { Response.RedirectPermanent("~/Admin/Suggestions"); }
     else if (redir == "parts") { Response.RedirectPermanent(Request.UrlReferrer.ToString()); }
     else if (redir == "groups") { Response.RedirectPermanent("~/Admin/Groups"); }
+    else if (redir == "groupmembers") { Response.RedirectPermanent(Request.UrlReferrer.ToString()); }
 
 }
 

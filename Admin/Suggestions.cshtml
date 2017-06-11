@@ -53,7 +53,7 @@
     {
         <tr>
             <td>@row.Title</td>
-            <td>@((row.IsOrchestra && row.IsChoir) ? "Orchestra/Choir" : (row.IsChoir ? "Choir" : row.IsOrchestra ? "Orchestra" : ""))</td>
+            <td><a href="~/Admin/GroupMembers.cshtml?groupID=@row.Group.ID&groupName=@Uri.EscapeDataString(row.Group.Name)">@row.Group.Name</a></td>
             <td></td>
             <td></td>
             <td>

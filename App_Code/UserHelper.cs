@@ -70,8 +70,8 @@ public static class UserHelper
         int index = fullName.LastIndexOf(' ');
         if (index != -1)
         {
-            firstname = fullName.Substring(index);
-            lastname = fullName.Substring(0, index);
+            lastname = fullName.Substring(index + 1);
+            firstname = fullName.Substring(0, index);
         }
         else lastname = fullName;
 
