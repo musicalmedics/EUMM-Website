@@ -26,7 +26,6 @@
     bool errLName = !ModelState.IsValidField("lname");
 
     // Query for suggestions
-    var db = Database.Open(Website.DBName);
     var suggestions = Suggestions.GetAll();
 }
 

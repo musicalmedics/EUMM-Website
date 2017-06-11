@@ -10,29 +10,29 @@
     Layout     = "~/Library/_SiteLayout.cshtml";
     Page.Title = "Loans";
 
-    var db = Database.Open(Website.DBName);
-
     var action = Request.Form["action"];
 
     if (IsPost)
     {
-        foreach (string key in Request.Form.Keys)
-        {
-            int id;
-            if (int.TryParse(key, out id))
+        Website.WithDatabase((db) =>
+        { 
+            foreach (string key in Request.Form.Keys)
             {
-                if (action == "fulfil") {
-                    db.Execute("UPDATE Loans SET Fulfilled='1' WHERE ID=@0", key);
-                }
-                else if (action == "return") {
-                    db.Execute("UPDATE Loans SET Returned='1', ReturnedOn=GETDATE() WHERE ID=@0", key);
+                int id;
+                if (int.TryParse(key, out id))
+                {
+                    if (action == "fulfil") {
+                        db.Execute("UPDATE Loans SET Fulfilled='1' WHERE ID=@0", key);
+                    }
+                    else if (action == "return") {
+                        db.Execute("UPDATE Loans SET Returned='1', ReturnedOn=GETDATE() WHERE ID=@0", key);
+                    }
                 }
             }
-        }
+        });
     }
     var view  = UserHelper.GetRequests();
     var loans = LibraryHelper.GetAllCurrentLoans();
-
 }
 
 <script type="text/javascript">

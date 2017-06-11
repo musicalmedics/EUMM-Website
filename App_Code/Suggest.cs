@@ -10,58 +10,58 @@ public static class Suggestions
 {
     public static bool ToggleEndorse(int suggestionID)
     {
-        var db    = Database.Open(Website.DBName);
         var user  = UserHelper.GetUser();
         int ipRaw = Website.ClientIntegerIP;
 
-        if (UserHelper.IsGuest(user.UUN))
-        {
-            // Check if existing for this IP as we're guest
-            int existing = db.QueryValue("SELECT COUNT(*) FROM [Endorsements2] WHERE UUN=@0 AND IP=@1 AND Suggestion=@2", 
-                                            user.UUN, ipRaw, suggestionID);
-            // Add or delete to toggle
-            if (existing != 0) {
-                db.Execute("DELETE FROM [Endorsements2] WHERE UUN=@0 AND IP=@1 AND Suggestion=@2", user.UUN, ipRaw, suggestionID);
+        return Website.WithDatabase((db) =>
+        { 
+            if (UserHelper.IsGuest(user.UUN))
+            {
+                // Check if existing for this IP as we're guest
+                int existing = db.QueryValue("SELECT COUNT(*) FROM [Endorsements2] WHERE UUN=@0 AND IP=@1 AND Suggestion=@2", 
+                                                user.UUN, ipRaw, suggestionID);
+                // Add or delete to toggle
+                if (existing != 0) {
+                    db.Execute("DELETE FROM [Endorsements2] WHERE UUN=@0 AND IP=@1 AND Suggestion=@2", user.UUN, ipRaw, suggestionID);
+                }
+                else db.Execute("INSERT INTO [Endorsements2] (IP, Suggestion) VALUES (@0, @1)", ipRaw, suggestionID);
             }
-            else db.Execute("INSERT INTO [Endorsements2] (IP, Suggestion) VALUES (@0, @1)", ipRaw, suggestionID);
-        }
-        else
-        {
-            // Check if existing for this user
-            int existing = db.QueryValue("SELECT COUNT(*) FROM [Endorsements2] WHERE UUN=@0 AND Suggestion=@1",
-                                            user.UUN, suggestionID);
-            // Add or delete to toggle
-            if (existing != 0) {
-                db.Execute("DELETE FROM [Endorsements2] WHERE UUN=@0 AND Suggestion=@1", user.UUN, suggestionID);
+            else
+            {
+                // Check if existing for this user
+                int existing = db.QueryValue("SELECT COUNT(*) FROM [Endorsements2] WHERE UUN=@0 AND Suggestion=@1",
+                                                user.UUN, suggestionID);
+                // Add or delete to toggle
+                if (existing != 0) {
+                    db.Execute("DELETE FROM [Endorsements2] WHERE UUN=@0 AND Suggestion=@1", user.UUN, suggestionID);
+                }
+                else db.Execute("INSERT INTO [Endorsements2] (UUN, Suggestion) VALUES (@0, @1)", user.UUN, suggestionID);
             }
-            else db.Execute("INSERT INTO [Endorsements2] (UUN, Suggestion) VALUES (@0, @1)", user.UUN, suggestionID);
-        }
-        return true; 
-        
+            return true; 
+        });
     }
 
     public static bool Remove(int suggestionID)
     {
-        var user = UserHelper.GetUser();
-        var db = Database.Open(Website.DBName);
-
         // Check if current user is admin - currently only Admins can remove suggestions
-        if (!user.IsAdmin) return false;
+        if (!UserHelper.GetUser().IsAdmin) return false;
 
-        // Delete all associated endorsements
-        db.Execute("DELETE FROM [Endorsements2] WHERE Suggestion=@0", suggestionID);
+        return Website.WithDatabase((db) =>
+        {
+            // Delete all associated endorsements
+            db.Execute("DELETE FROM [Endorsements2] WHERE Suggestion=@0", suggestionID);
 
-        // Delete suggestion
-        return db.Execute("DELETE FROM Suggestions WHERE Suggestion=@0", suggestionID) == 1;
+            // Delete suggestion
+            return db.Execute("DELETE FROM Suggestions WHERE Suggestion=@0", suggestionID) == 1;
+        });
     }
 
     public static int Create(string title, int groupID)
     {
         var user = UserHelper.GetUser();
-        var db   = Database.Open(Website.DBName);
-
-        var res = db.QueryValue("INSERT INTO Suggestions(Title,[Group],CreatorUUN) OUTPUT INSERTED.Suggestion VALUES (@0, @1, @2)", 
-            title.Length <= 120 ? title : title.Substring(0, 120), groupID, user.UUN);
+        var res = Website.WithDatabase((db) => db.QueryValue(
+            "INSERT INTO Suggestions(Title,[Group],CreatorUUN) OUTPUT INSERTED.Suggestion VALUES (@0, @1, @2)",
+            title.Length <= 120 ? title : title.Substring(0, 120), groupID, user.UUN));
 
         // Endorse your suggestion
         ToggleEndorse((int)res);
@@ -91,23 +91,23 @@ public static class Suggestions
     }
     public static IEnumerable<int> GetEndorsed(string userID)
     {
-        var db    = Database.Open(Website.DBName);
         int ipRaw = Website.ClientIntegerIP;
 
-        IEnumerable<dynamic> res;
-
-        if (UserHelper.IsGuest(userID))
+        var res = Website.WithDatabase((db) =>
         {
-            res = db.Query(@"SELECT DISTINCT Suggestions.Suggestion FROM Suggestions 
+            if (UserHelper.IsGuest(userID))
+            {
+                return db.Query(@"SELECT DISTINCT Suggestions.Suggestion FROM Suggestions 
                              JOIN Endorsements2 ON Suggestions.Suggestion=Endorsements2.Suggestion
                              WHERE UUN=@0 AND Endorsements2.IP=@1", userID, ipRaw);
-        }
-        else
-        {
-            res = db.Query(@"SELECT DISTINCT Suggestions.Suggestion FROM Suggestions 
+            }
+            else
+            {
+                return db.Query(@"SELECT DISTINCT Suggestions.Suggestion FROM Suggestions 
                              JOIN Endorsements2 ON Suggestions.Suggestion=Endorsements2.Suggestion
                              WHERE UUN=@0", userID);
-        }
+            }
+        });
         
         // Convert to int array
         int[] output = new int[res.Count()];
