@@ -28,19 +28,6 @@
                 </div>
                 <div class="float-right">
                     <section id="login">
-                        @if (WebSecurity.IsAuthenticated) {
-                            <text>
-                                Hello, <a class="email" href="~/Account/Manage" title="Manage">@WebSecurity.CurrentUserName</a>!
-                                <form id="logoutForm" action="~/Account/Logout" method="post">
-                                    @AntiForgery.GetHtml()
-                                    <a href="javascript:document.getElementById('logoutForm').submit()">Log out</a>
-                                </form>
-                            </text>
-                        } else {
-                            <ul>
-                                <li><a href="~/Account/Login">Log in</a></li>
-                            </ul>
-                        }
                     </section>
                     <nav>
                         <ul id="menu">
@@ -51,21 +38,6 @@
                             <li><a href="~/AboutUs">About Us</a></li>
                         </ul>
                     </nav>
-                    @if (WebSecurity.IsAuthenticated && UserHelper.IsAdmin())
-                    {
-                        string count = UserHelper.CountRequests().ToString();
-                        
-                        <div style="float:right; background-color: #DDD">
-                        <ul id="menu">
-                            <li>Admin&nbsp;&nbsp;</li>
-                            <li><a href="~/Admin/Loans">Loans (@count)</a></li>
-                            <li><a href="~/Admin/Members">Members</a></li>
-                            <li><a href="~/Admin/Groups">Groups</a></li>
-                            <li><a href="~/Admin/Library">Library</a></li>
-                            <li><a href="~/Admin/Suggestions">Suggestions</a></li>
-                        </ul>
-                        </div>
-                    }
                 </div>
             </div>
         </header>

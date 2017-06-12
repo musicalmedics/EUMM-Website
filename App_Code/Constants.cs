@@ -29,6 +29,9 @@ public static partial class Website
     public const int Format_PaperCopy   = 1;
     public const int Format_DigitalCopy = 2;
 
+    // Should be '/'-terminated
+    public static readonly string libraryUrl = "https://online-library.azurewebsites.net/";
+
     public static readonly string DBName    = "musicDB"; //"musicDBLocal";
     public static readonly string HiddenDir = "~/Hidden/";
     public static readonly string Webmaster = "jsrenwick3@gmail.com";

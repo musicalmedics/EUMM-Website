@@ -2,9 +2,6 @@
  * -------------------------------------
  * Version 1.2.0
  */
-using System;
-using System.Collections.Generic;
-using System.Dynamic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -36,36 +33,7 @@ public static partial class Website
     {
         return (libraryValue & Website.Library_Orchestra) != 0;
     }
-
-    public static IDictionary<IEnumerable<Library>, IEnumerable<dynamic>> GroupPiecesByLibraries(
-        IEnumerable<dynamic> pieces)
-    {
-        var temp = new Dictionary<int, List<dynamic>>();
-
-        foreach (var piece in pieces)
-        {
-            int lib = piece.Libraries;
-
-            if (!temp.ContainsKey(lib)) {
-                temp.Add(lib, new List<dynamic>());
-            }
-            temp[lib].Add(piece);
-        }
-
-        var output = new Dictionary<IEnumerable<Library>, IEnumerable<dynamic>>();
-
-        foreach (int key in temp.Keys)
-        {
-            var libs = new List<Library>();
-            foreach (var lib in Website.Libraries)
-            {
-                if ((key & lib.ID) != 0) libs.Add(lib);
-            }
-
-            output.Add(libs, temp[key]);
-        }
-        return output;
-    }
+    
 
     /// <summary>
     /// Gets a formatted currency string for the given double value.
@@ -112,61 +80,6 @@ public static partial class Website
         return sb.ToString();
     }
 
-    /// <summary>
-    /// Gets the return date for the loan.
-    /// 
-    /// If both are defined, takes the closest date from
-    /// the next performance and the return-to-uni-library date.
-    /// 
-    /// If one of those is not null, uses that. Otherwise,
-    /// defaults to a loan period of one month.
-    /// </summary>
-    /// <param name="piece">The piece record for which to get the return date.</param>
-    public static DateTime CalculateReturnDate(dynamic piece)
-    {
-        DateTime? end = piece.LoanEnd;
-        DateTime? per = piece.NextPerformance;
-        DateTime  def = DateTime.Now.AddMonths(1); // Fallback is 1 month
-
-        if (end != null && per != null) {
-            return end.Value < per.Value ? end.Value : per.Value;
-        }
-        else return (DateTime)(end ?? per ?? def);
-    }
-
-    /// <summary>
-    /// Converts the row object into a dynamic object whose
-    /// fields and values you can edit.
-    /// </summary>
-    public static dynamic ExpandoFromRow(dynamic row)
-    {
-        IDictionary<string, object> obj = new ExpandoObject();
-
-        foreach (var column in row.Columns) {
-            obj.Add(column, row[column]);
-        }
-        return (ExpandoObject)obj;
-    }
-    /// <summary>
-    /// Converts the given table into a dynamic object whose
-    /// fields and values you can edit.
-    /// </summary>
-    public static dynamic[] ExpandoFromTable(IEnumerable<dynamic> table)
-    {
-        ExpandoObject[] output = new ExpandoObject[table.Count()];
-
-        int i = 0;
-        foreach (var row in table)
-        { 
-            IDictionary<string, object> obj = new ExpandoObject();
-
-            foreach (var column in row.Columns) {
-                obj.Add(column, row[column]);
-            }
-            output[i++] = (ExpandoObject)obj;
-        }
-        return output;
-    }
 
     public static void RedirectToDownload(string filepath, string contentType, HttpResponseBase response)
     {
@@ -183,36 +96,6 @@ public static partial class Website
         else throw new FileNotFoundException();
     }
 
-    public static void UploadHiddenFile(string filename, Stream data)
-    {
-        UploadHiddenFile(filename, "", data);
-    }
-    public static void UploadHiddenFile(string filename, string subdir, Stream data)
-    {
-        string path = HttpContext.Current.Server.MapPath(Path.Combine(Website.HiddenDir, subdir));
-
-        // Ensure 'Hidden' directory exists
-        Directory.CreateDirectory(HttpContext.Current.Server.MapPath(Website.HiddenDir));
-        Directory.CreateDirectory(path);
-
-        // Create or overwrite file
-        var file = File.Create(Path.Combine(path, filename));
-
-        file.Seek(0, SeekOrigin.Begin);
-        data.CopyTo(file);
-        file.Close();
-    }
-
-    public static bool DeleteHiddenFile(string filepath)
-    {
-        // We're intentionally causing exceptions for now
-        filepath = Path.Combine(HttpContext.Current.Server.MapPath(Website.HiddenDir),
-            filepath);
-
-        // Delete file
-        File.Delete(filepath);
-        return true;
-    }
 
     public static int ClientIntegerIP
     {
@@ -230,43 +113,6 @@ public static partial class Website
 #pragma warning restore CS0618
             }
             return ipRaw;
-        }
-    }
-
-
-    public static string MimeTypeFromFilename(string filename)
-    {
-        switch (Path.GetExtension(filename).ToLower())
-        {
-            case ".pdf":
-                return System.Net.Mime.MediaTypeNames.Application.Pdf;
-            case ".jpg":
-            case ".jpeg":
-                return System.Net.Mime.MediaTypeNames.Image.Jpeg;
-            case ".png":
-                return "image/png";
-            case ".tiff":
-                return System.Net.Mime.MediaTypeNames.Image.Tiff;
-            case ".gif":
-                return System.Net.Mime.MediaTypeNames.Image.Gif;
-            case ".zip":
-                return System.Net.Mime.MediaTypeNames.Application.Zip;
-            default:
-                return System.Net.Mime.MediaTypeNames.Application.Octet;
-        }
-    }
-
-
-    public static T WithDatabase<T>(Func<WebMatrix.Data.Database, T> lambda)
-    {
-        using (var db = WebMatrix.Data.Database.Open(Website.DBName)) {
-            return lambda.Invoke(db);
-        }
-    }
-    public static void WithDatabase(Action<WebMatrix.Data.Database> lambda)
-    {
-        using (var db = WebMatrix.Data.Database.Open(Website.DBName)) {
-            lambda.Invoke(db);
         }
     }
 
