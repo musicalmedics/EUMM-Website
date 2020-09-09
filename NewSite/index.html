@@ -9,9 +9,15 @@
     <meta name="robots" content="nosnippet" />
     <meta name="description" content="Edinburgh University Musical Medics."/>
     <link rel="image_src" href="http://eumm.azurewebsites.net/Images/webbanner.png" />
+
+    <!-- The website's styling -->
+    <link href="Style/Site.css" rel="stylesheet" type="text/css" />
 </head>
 <!-- This part provides the page's content. -->
-<body>
+<body style='margin: 0'>
+    <!-- Keep this here so that we can show a loading message while the page is being prepared -->
+    <div id='eumm-loading'><span>Loading...</span></div>
+
     <section class="featured" data-section="featured">
         <div class="content-wrapper">
             <img src="Images/eumm.png" id="eummlogo" width="200"/>

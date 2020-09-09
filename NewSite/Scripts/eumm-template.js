@@ -80,7 +80,7 @@ function applyBodyTemplate(content) {
 
     const mainSection = initialDiv.querySelector('section[data-main-section]');
     for (const elem of Array.prototype.slice.call(body.children)) {
-        if (!elem.getAttribute('data-section')) {
+        if (!elem.getAttribute('data-section') && elem.id !== 'eumm-loading') {
             mainSection.appendChild(elem);
         }
     }
@@ -89,12 +89,17 @@ function applyBodyTemplate(content) {
 }
 
 function applyDocumentTemplate() {
+    // First hide the site
+    const loadingDiv = document.getElementById('eumm-loading');
+    loadingDiv.style.display = 'flex';
+
     // First load both _head and _body
     try {
         loadFile('_head.html', applyHeadTemplate, onTemplateError);
         loadFile('_body.html', applyBodyTemplate, onTemplateError);
     } catch (e) {
         onTemplateError();
+        loadingDiv.style.display = 'none';
         throw e;
     }
 }
