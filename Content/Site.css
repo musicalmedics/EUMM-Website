@@ -12,8 +12,6 @@ body {
     font-family: "Segoe UI", Verdana, Helvetica, Sans-Serif;
     margin: 0;
     padding: 0;
-}
-body[data-site="main"] {
     border-top: solid 10px #A12904;
 }
 body[data-site="library"] {
